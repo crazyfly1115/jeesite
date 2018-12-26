@@ -38,6 +38,8 @@
     	a.office_id AS "office.id",
     	a.name,
     	a.enname,
+    	a.name as "oldName",
+    	a.enname as "oldEnname",
     	a.role_type AS roleType,
 		a.data_scope AS dataScope,
 		a.remarks,

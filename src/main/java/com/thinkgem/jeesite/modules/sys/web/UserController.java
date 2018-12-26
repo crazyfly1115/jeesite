@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolationException;
 
+import com.thinkgem.jeesite.common.bean.Ret;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -67,22 +68,23 @@ public class UserController extends BaseController {
 
 	@RequiresPermissions("sys:user:view")
 	@RequestMapping(value = {"list", ""})
+	@ResponseBody
 	public String list(User user, HttpServletRequest request, HttpServletResponse response, Model model) {
 		Page<User> page = systemService.findUser(new Page<User>(request, response), user);
-        model.addAttribute("page", page);
-		return "modules/sys/userList";
+		return  new Ret().putMap("data",page).toString();
 	}
 	
 	@ResponseBody
 	@RequiresPermissions("sys:user:view")
 	@RequestMapping(value = {"listData"})
-	public Page<User> listData(User user, HttpServletRequest request, HttpServletResponse response, Model model) {
+	public String listData(User user, HttpServletRequest request, HttpServletResponse response, Model model) {
 		Page<User> page = systemService.findUser(new Page<User>(request, response), user);
-		return page;
+		return new Ret("data",page).toString();
 	}
 
 	@RequiresPermissions("sys:user:view")
 	@RequestMapping(value = "form")
+	@ResponseBody
 	public String form(User user, Model model) {
 		if (user.getCompany()==null || user.getCompany().getId()==null){
 			user.setCompany(UserUtils.getUser().getCompany());
@@ -90,17 +92,15 @@ public class UserController extends BaseController {
 		if (user.getOffice()==null || user.getOffice().getId()==null){
 			user.setOffice(UserUtils.getUser().getOffice());
 		}
-		model.addAttribute("user", user);
-		model.addAttribute("allRoles", systemService.findAllRole());
-		return "modules/sys/userForm";
+		return new Ret().putMap("user",user).toString();
 	}
 
 	@RequiresPermissions("sys:user:edit")
 	@RequestMapping(value = "save")
+	@ResponseBody
 	public String save(User user, HttpServletRequest request, Model model, RedirectAttributes redirectAttributes) {
 		if(Global.isDemoMode()){
-			addMessage(redirectAttributes, "演示模式，不允许操作！");
-			return "redirect:" + adminPath + "/sys/user/list?repage";
+			return new  Ret(1,"演示模式，不允许操作！").toString();
 		}
 		// 修正引用赋值问题，不知道为何，Company和Office引用的一个实例地址，修改了一个，另外一个跟着修改。
 		user.setCompany(new Office(request.getParameter("company.id")));
@@ -110,11 +110,12 @@ public class UserController extends BaseController {
 			user.setPassword(SystemService.entryptPassword(user.getNewPassword()));
 		}
 		if (!beanValidator(model, user)){
-			return form(user, model);
+			return  new Ret(1,model.asMap().toString()).toString();
 		}
 		if (!"true".equals(checkLoginName(user.getOldLoginName(), user.getLoginName()))){
-			addMessage(model, "保存用户'" + user.getLoginName() + "'失败，登录名已存在");
-			return form(user, model);
+//			addMessage(model, "保存用户'" + user.getLoginName() + "'失败，登录名已存在");
+//			return form(user, model);
+			return new Ret(1,"保存用户'" + user.getLoginName() + "'失败，登录名已存在").toString();
 		}
 		// 角色数据有效性验证，过滤不在授权内的角色
 		List<Role> roleList = Lists.newArrayList();
@@ -132,26 +133,26 @@ public class UserController extends BaseController {
 			UserUtils.clearCache();
 			//UserUtils.getCacheMap().clear();
 		}
-		addMessage(redirectAttributes, "保存用户'" + user.getLoginName() + "'成功");
-		return "redirect:" + adminPath + "/sys/user/list?repage";
+//		addMessage(redirectAttributes, "保存用户'" + user.getLoginName() + "'成功");
+//		return "redirect:" + adminPath + "/sys/user/list?repage";
+		return new Ret(0,"保存用户'" + user.getLoginName() + "'成功").putMap("user",user).toString();
 	}
 	
 	@RequiresPermissions("sys:user:edit")
 	@RequestMapping(value = "delete")
-	public String delete(User user, RedirectAttributes redirectAttributes) {
+	@ResponseBody
+	public String delete(User user) {
 		if(Global.isDemoMode()){
-			addMessage(redirectAttributes, "演示模式，不允许操作！");
-			return "redirect:" + adminPath + "/sys/user/list?repage";
+			return new  Ret(1,"演示模式，不允许操作！").toString();
 		}
 		if (UserUtils.getUser().getId().equals(user.getId())){
-			addMessage(redirectAttributes, "删除用户失败, 不允许删除当前用户");
+			return new  Ret(1,"删除用户失败, 不允许删除当前用户").toString();
 		}else if (User.isAdmin(user.getId())){
-			addMessage(redirectAttributes, "删除用户失败, 不允许删除超级管理员用户");
+			return new  Ret(1,"删除用户失败, 不允许删除超级管理员用户").toString();
 		}else{
 			systemService.deleteUser(user);
-			addMessage(redirectAttributes, "删除用户成功");
 		}
-		return "redirect:" + adminPath + "/sys/user/list?repage";
+		return  new Ret().toString();
 	}
 	
 	/**

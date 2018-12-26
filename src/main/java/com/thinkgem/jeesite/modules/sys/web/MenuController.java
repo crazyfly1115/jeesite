@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.thinkgem.jeesite.common.bean.Ret;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -50,12 +51,14 @@ public class MenuController extends BaseController {
 
 	@RequiresPermissions("sys:menu:view")
 	@RequestMapping(value = {"list", ""})
+	@ResponseBody
 	public String list(Model model) {
 		List<Menu> list = Lists.newArrayList();
 		List<Menu> sourcelist = systemService.findAllMenu();
 		Menu.sortList(list, sourcelist, Menu.getRootId(), true);
-        model.addAttribute("list", list);
-		return "modules/sys/menuList";
+		return new Ret().putMap("list",list).toString();
+//        model.addAttribute("list", list);
+//		return "modules/sys/menuList";
 	}
 
 	@RequiresPermissions("sys:menu:view")
@@ -80,37 +83,30 @@ public class MenuController extends BaseController {
 	
 	@RequiresPermissions("sys:menu:edit")
 	@RequestMapping(value = "save")
+	@ResponseBody
 	public String save(Menu menu, Model model, RedirectAttributes redirectAttributes) {
 		if(!UserUtils.getUser().isAdmin()){
-			addMessage(redirectAttributes, "越权操作，只有超级管理员才能添加或修改数据！");
-			return "redirect:" + adminPath + "/sys/role/?repage";
+			return new Ret(1,"越权操作，只有超级管理员才能添加或修改数据！").toString();
 		}
 		if(Global.isDemoMode()){
-			addMessage(redirectAttributes, "演示模式，不允许操作！");
-			return "redirect:" + adminPath + "/sys/menu/";
+			return new Ret(1,"演示模式，不允许操作！").toString();
 		}
 		if (!beanValidator(model, menu)){
-			return form(menu, model);
+			return new Ret(1,model.asMap().toString()).toString();
 		}
 		systemService.saveMenu(menu);
-		addMessage(redirectAttributes, "保存菜单'" + menu.getName() + "'成功");
-		return "redirect:" + adminPath + "/sys/menu/";
+		return  new Ret().putMap("data",menu).toString();
 	}
 	
 	@RequiresPermissions("sys:menu:edit")
 	@RequestMapping(value = "delete")
-	public String delete(Menu menu, RedirectAttributes redirectAttributes) {
+	@ResponseBody
+	public String delete(Menu menu) {
 		if(Global.isDemoMode()){
-			addMessage(redirectAttributes, "演示模式，不允许操作！");
-			return "redirect:" + adminPath + "/sys/menu/";
+			return new Ret(1,"演示模式，不允许操作！").toString();
 		}
-//		if (Menu.isRoot(id)){
-//			addMessage(redirectAttributes, "删除菜单失败, 不允许删除顶级菜单或编号为空");
-//		}else{
-			systemService.deleteMenu(menu);
-			addMessage(redirectAttributes, "删除菜单成功");
-//		}
-		return "redirect:" + adminPath + "/sys/menu/";
+		systemService.deleteMenu(menu);
+		return  new Ret().toString();
 	}
 
 	@RequiresPermissions("user")

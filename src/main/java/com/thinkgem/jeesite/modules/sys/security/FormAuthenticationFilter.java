@@ -7,14 +7,19 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import com.thinkgem.jeesite.common.bean.Ret;
+import com.thinkgem.jeesite.common.web.BaseController;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;
+import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.util.WebUtils;
 import org.springframework.stereotype.Service;
 
 import com.thinkgem.jeesite.common.utils.StringUtils;
+
+import java.io.IOException;
 
 /**
  * 表单验证（包含验证码）过滤类
@@ -127,7 +132,7 @@ public class FormAuthenticationFilter extends org.apache.shiro.web.filter.authc.
 		String className = e.getClass().getName(), message = "";
 		if (IncorrectCredentialsException.class.getName().equals(className)
 				|| UnknownAccountException.class.getName().equals(className)){
-			message = "用户或密码错误, 请重试.";
+			message = "用户或密码错误, 请重试！";
 		}
 		else if (e.getMessage() != null && StringUtils.startsWith(e.getMessage(), "msg:")){
 			message = StringUtils.replace(e.getMessage(), "msg:", "");
@@ -136,9 +141,16 @@ public class FormAuthenticationFilter extends org.apache.shiro.web.filter.authc.
 			message = "系统出现点问题，请稍后再试！";
 			e.printStackTrace(); // 输出到控制台
 		}
-        request.setAttribute(getFailureKeyAttribute(), className);
-        request.setAttribute(getMessageParam(), message);
+
+//        request.setAttribute(getFailureKeyAttribute(), className);
+//        request.setAttribute(getMessageParam(), message);
         return true;
 	}
-	
+
+	@Override
+	protected boolean onLoginSuccess(AuthenticationToken token, Subject subject, ServletRequest request, ServletResponse response) throws Exception {
+//		return super.onLoginSuccess(token, subject, request, response);
+
+		return true;
+	}
 }

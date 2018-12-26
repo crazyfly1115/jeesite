@@ -285,6 +285,7 @@ public class Page<T> {
 	 * 获取分页HTML代码
 	 * @return
 	 */
+	@JsonIgnore
 	public String getHtml(){
 		return toString();
 	}

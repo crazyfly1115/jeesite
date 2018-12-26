@@ -2,8 +2,8 @@
 response.setStatus(404);
 
 // 如果是异步请求或是手机端，则直接返回信息
-if (Servlets.isAjaxRequest(request)) {
-	out.print("页面不存在.");
+if (1==1) {
+	out.print("{\"ret\":-404,\"msg\":\"\",\"errCode\":\"notfound\"}");
 }
 
 //输出异常信息页面

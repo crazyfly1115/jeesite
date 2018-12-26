@@ -15,17 +15,21 @@ import javax.validation.Validator;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.thinkgem.jeesite.common.bean.Ret;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.thinkgem.jeesite.common.beanvalidator.BeanValidators;
@@ -170,16 +174,42 @@ public abstract class BaseController {
 	 * 参数绑定异常
 	 */
 	@ExceptionHandler({BindException.class, ConstraintViolationException.class, ValidationException.class})
-    public String bindException() {  
-        return "error/400";
-    }
+	public String bindException() {
+		return "error/400";
+	}
+	@ExceptionHandler({com.google.gson.JsonSyntaxException.class})
+	@ResponseBody
+	public String IllegalStateException(Exception e){
+		logger.error("Gson转换异常",e);
+		return new Ret(1,"Gson转换异常.").toString();
+	}
+	@ExceptionHandler({RuntimeException.class})
+	@ResponseBody
+	public String RuntimeException(RuntimeException e){
+		logger.error("运行时异常",e);
+		return new Ret(1,"错误提示:"+e.getMessage()).toString();
+	}
+	@ExceptionHandler({MissingServletRequestParameterException.class})
+	@ResponseBody
+	public String MissingServletRequestParameterException(MissingServletRequestParameterException e){
+		return new Ret(1,"该参数必填:"+e.getMessage()).toString();
+	}
+	@ExceptionHandler({DuplicateKeyException.class})
+	@ResponseBody
+	public String DuplicateKeyException(DuplicateKeyException e){
+		logger.error("数据库异常:违反主键约束",e);
+		return new Ret(1,"数据库:该值已经存在!").toString();
+	}
 	
 	/**
 	 * 授权登录异常
 	 */
 	@ExceptionHandler({AuthenticationException.class})
-    public String authenticationException() {  
-        return "error/403";
+	@ResponseBody
+    public String authenticationException() {
+
+		return new Ret(-1,"授权登录异常，请退出后重新登录").toString();
+
     }
 	
 	/**

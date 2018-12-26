@@ -30,6 +30,7 @@ public class Menu extends DataEntity<Menu> {
 	private Integer sort; 	// 排序
 	private String isShow; 	// 是否在菜单中显示（1：显示；0：不显示）
 	private String permission; // 权限标识
+	private String isButton;//是否按钮，
 	
 	private String userId;
 	
@@ -128,6 +129,9 @@ public class Menu extends DataEntity<Menu> {
 	public String getParentId() {
 		return parent != null && parent.getId() != null ? parent.getId() : "0";
 	}
+	public String getParentName() {
+		return parent != null && parent.getName() != null ? parent.getName() : "";
+	}
 
 	@JsonIgnore
 	public static void sortList(List<Menu> list, List<Menu> sourcelist, String parentId, boolean cascade){
@@ -167,5 +171,13 @@ public class Menu extends DataEntity<Menu> {
 	@Override
 	public String toString() {
 		return name;
+	}
+
+	public String getIsButton() {
+		return isButton;
+	}
+
+	public void setIsButton(String isButton) {
+		this.isButton = isButton;
 	}
 }

@@ -16,8 +16,8 @@ if (ex != null) {
 }
 
 // 如果是异步请求或是手机端，则直接返回信息
-if (Servlets.isAjaxRequest(request)) {
-	out.print(sb);
+if (1==1) {
+	out.print("{\"ret\":500,\"msg\":\""+sb+"\",\"errCode\":\"500-未知错误\"}");
 }
 
 // 输出异常信息页面

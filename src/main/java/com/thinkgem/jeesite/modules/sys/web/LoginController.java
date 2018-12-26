@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.thinkgem.jeesite.common.bean.Ret;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.web.util.WebUtils;
@@ -30,6 +31,7 @@ import com.thinkgem.jeesite.common.web.BaseController;
 import com.thinkgem.jeesite.modules.sys.security.FormAuthenticationFilter;
 import com.thinkgem.jeesite.modules.sys.security.SystemAuthorizingRealm.Principal;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * 登录Controller
@@ -46,15 +48,9 @@ public class LoginController extends BaseController{
 	 * 管理登录
 	 */
 	@RequestMapping(value = "${adminPath}/login", method = RequestMethod.GET)
+	@ResponseBody
 	public String login(HttpServletRequest request, HttpServletResponse response, Model model) {
 		Principal principal = UserUtils.getPrincipal();
-
-//		// 默认页签模式
-//		String tabmode = CookieUtils.getCookie(request, "tabmode");
-//		if (tabmode == null){
-//			CookieUtils.setCookie(response, "tabmode", "1");
-//		}
-		
 		if (logger.isDebugEnabled()){
 			logger.debug("login, active session size: {}", sessionDAO.getActiveSessions(false).size());
 		}
@@ -66,7 +62,18 @@ public class LoginController extends BaseController{
 		
 		// 如果已经登录，则跳转到管理首页
 		if(principal != null && !principal.isMobileLogin()){
-			return "redirect:" + adminPath;
+			Ret ret=new Ret();
+			ret.setRet(0);
+			ret.setErrCode("login");
+			ret.setMsg("");
+			ret.putMap("x-token",principal.getSessionid());
+			return ret.toString();
+		}else{
+			Ret ret=new Ret();
+			ret.setRet(-1);
+			ret.setErrCode("notLogin");
+			ret.setMsg("请重新登录");
+			return ret.toString();
 		}
 //		String view;
 //		view = "/WEB-INF/views/modules/sys/sysLogin.jsp";
@@ -74,19 +81,25 @@ public class LoginController extends BaseController{
 //		view += "jar:file:/D:/GitHub/jeesite/src/main/webapp/WEB-INF/lib/jeesite.jar!";
 //		view += "/"+getClass().getName().replaceAll("\\.", "/").replace(getClass().getSimpleName(), "")+"view/sysLogin";
 //		view += ".jsp";
-		return "modules/sys/sysLogin";
+//		return "modules/sys/sysLogin";
 	}
 
 	/**
 	 * 登录失败，真正登录的POST请求由Filter完成
 	 */
 	@RequestMapping(value = "${adminPath}/login", method = RequestMethod.POST)
+	@ResponseBody
 	public String loginFail(HttpServletRequest request, HttpServletResponse response, Model model) {
 		Principal principal = UserUtils.getPrincipal();
 		
 		// 如果已经登录，则跳转到管理首页
 		if(principal != null){
-			return "redirect:" + adminPath;
+//			return "redirect:" + adminPath;
+			Ret ret=new Ret();
+			ret.setRet(0);
+			ret.setMsg("登录成功");
+			ret.putMap("x-token",principal.getSessionid());
+			return ret.toString();
 		}
 
 		String username = WebUtils.getCleanParam(request, FormAuthenticationFilter.DEFAULT_USERNAME_PARAM);
@@ -99,12 +112,17 @@ public class LoginController extends BaseController{
 			message = "用户或密码错误, 请重试.";
 		}
 
-		model.addAttribute(FormAuthenticationFilter.DEFAULT_USERNAME_PARAM, username);
-		model.addAttribute(FormAuthenticationFilter.DEFAULT_REMEMBER_ME_PARAM, rememberMe);
-		model.addAttribute(FormAuthenticationFilter.DEFAULT_MOBILE_PARAM, mobile);
-		model.addAttribute(FormAuthenticationFilter.DEFAULT_ERROR_KEY_ATTRIBUTE_NAME, exception);
-		model.addAttribute(FormAuthenticationFilter.DEFAULT_MESSAGE_PARAM, message);
-		
+//		model.addAttribute(FormAuthenticationFilter.DEFAULT_USERNAME_PARAM, username);
+//		model.addAttribute(FormAuthenticationFilter.DEFAULT_REMEMBER_ME_PARAM, rememberMe);
+//		model.addAttribute(FormAuthenticationFilter.DEFAULT_MOBILE_PARAM, mobile);
+//		model.addAttribute(FormAuthenticationFilter.DEFAULT_ERROR_KEY_ATTRIBUTE_NAME, exception);
+//		model.addAttribute(FormAuthenticationFilter.DEFAULT_MESSAGE_PARAM, message);
+		Ret ret=new Ret();
+		ret.setRet(-1);
+		ret.setErrCode("notLogin");
+		ret.setMsg(message);
+		ret.putMap("username",username);
+
 		if (logger.isDebugEnabled()){
 			logger.debug("login fail, active session size: {}, message: {}, exception: {}", 
 					sessionDAO.getActiveSessions(false).size(), message, exception);
@@ -113,17 +131,18 @@ public class LoginController extends BaseController{
 		// 非授权异常，登录失败，验证码加1。
 		if (!UnauthorizedException.class.getName().equals(exception)){
 			model.addAttribute("isValidateCodeLogin", isValidateCodeLogin(username, true, false));
+			ret.putMap("isValidateCodeLogin",isValidateCodeLogin(username, true, false));
 		}
-		
+
 		// 验证失败清空验证码
 		request.getSession().setAttribute(ValidateCodeServlet.VALIDATE_CODE, IdGen.uuid());
-		
+		return ret.toString();
 		// 如果是手机登录，则返回JSON字符串
-		if (mobile){
-	        return renderString(response, model);
-		}
+//		if (mobile){
+//	        return renderString(response, model);
+//		}
 		
-		return "modules/sys/sysLogin";
+//		return "modules/sys/sysLogin";
 	}
 
 	/**
@@ -163,23 +182,6 @@ public class LoginController extends BaseController{
 			return "redirect:" + adminPath + "/login";
 		}
 		
-//		// 登录成功后，获取上次登录的当前站点ID
-//		UserUtils.putCache("siteId", StringUtils.toLong(CookieUtils.getCookie(request, "siteId")));
-
-//		System.out.println("==========================a");
-//		try {
-//			byte[] bytes = com.thinkgem.jeesite.common.utils.FileUtils.readFileToByteArray(
-//					com.thinkgem.jeesite.common.utils.FileUtils.getFile("c:\\sxt.dmp"));
-//			UserUtils.getSession().setAttribute("kkk", bytes);
-//			UserUtils.getSession().setAttribute("kkk2", bytes);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-////		for (int i=0; i<1000000; i++){
-////			//UserUtils.getSession().setAttribute("a", "a");
-////			request.getSession().setAttribute("aaa", "aa");
-////		}
-//		System.out.println("==========================b");
 		return "modules/sys/sysIndex";
 	}
 	
@@ -222,5 +224,56 @@ public class LoginController extends BaseController{
 			loginFailMap.remove(useruame);
 		}
 		return loginFailNum >= 3;
+	}
+
+	/**
+	 * @Author zhangsy
+	 * @Description 登录之后获取用户信息
+	 * @Date 10:42 2018/11/28
+	 * @Param
+	 * @return
+	 * @Company 重庆尚渝网络科技
+	 * @version v1000
+	 **/
+	@RequiresPermissions("user")
+	@RequestMapping(value = "${adminPath}/info")
+	@ResponseBody
+	public String info(HttpServletRequest request, HttpServletResponse response){
+		Principal principal = UserUtils.getPrincipal();
+
+		// 登录成功后，验证码计算器清零
+		isValidateCodeLogin(principal.getLoginName(), false, true);
+
+		if (logger.isDebugEnabled()){
+			logger.debug("show index, active session size: {}", sessionDAO.getActiveSessions(false).size());
+		}
+
+		Ret ret=new Ret();
+		ret.putMap("user",UserUtils.getUser());
+		ret.putMap("menuList",UserUtils.getMenuListTree());
+		return ret.toString();
+//		// 如果已登录，再次访问主页，则退出原账号。
+//		if (Global.TRUE.equals(Global.getConfig("notAllowRefreshIndex"))){
+//			String logined = CookieUtils.getCookie(request, "LOGINED");
+//			if (StringUtils.isBlank(logined) || "false".equals(logined)){
+//				CookieUtils.setCookie(response, "LOGINED", "true");
+//			}else if (StringUtils.equals(logined, "true")){
+//				UserUtils.getSubject().logout();
+//				return "redirect:" + adminPath + "/login";
+//			}
+//		}
+
+//		// 如果是手机登录，则返回JSON字符串
+//		if (principal.isMobileLogin()){
+//			if (request.getParameter("login") != null){
+//				return renderString(response, principal);
+//			}
+//			if (request.getParameter("index") != null){
+//				return "modules/sys/sysIndex";
+//			}
+//			return "redirect:" + adminPath + "/login";
+//		}
+//
+//		return "modules/sys/sysIndex";
 	}
 }

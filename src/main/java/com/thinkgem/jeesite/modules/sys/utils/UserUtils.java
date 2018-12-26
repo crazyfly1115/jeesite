@@ -5,6 +5,9 @@ package com.thinkgem.jeesite.modules.sys.utils;
 
 import java.util.List;
 
+import com.google.common.collect.Lists;
+import com.thinkgem.jeesite.common.utils.Vuetree.TreeUtil;
+import com.thinkgem.jeesite.common.utils.Vuetree.VueTreeDTO;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.UnavailableSecurityManagerException;
 import org.apache.shiro.session.InvalidSessionException;
@@ -173,7 +176,14 @@ public class UserUtils {
 		}
 		return menuList;
 	}
-	
+	public static  List<VueTreeDTO> getMenuListTree(){
+		List<VueTreeDTO> mapList = Lists.newArrayList();
+		for (Menu e:getMenuList()){
+			VueTreeDTO v=new VueTreeDTO(e.getName(), e.getParentId(), e.getId(),e.getHref(),e.getIcon());
+			mapList.add(v);
+		}
+		return 	TreeUtil.List2Tree(mapList);
+	}
 	/**
 	 * 获取当前用户授权的区域
 	 * @return

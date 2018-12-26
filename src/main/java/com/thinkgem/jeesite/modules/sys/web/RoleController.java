@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.thinkgem.jeesite.common.bean.Ret;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -47,21 +48,21 @@ public class RoleController extends BaseController {
 	@Autowired
 	private OfficeService officeService;
 	
-	@ModelAttribute("role")
-	public Role get(@RequestParam(required=false) String id) {
-		if (StringUtils.isNotBlank(id)){
-			return systemService.getRole(id);
-		}else{
-			return new Role();
-		}
-	}
+//	@ModelAttribute("role")
+//	public Role get(@RequestParam(required=false) String id) {
+//		if (StringUtils.isNotBlank(id)){
+//			return systemService.getRole(id);
+//		}else{
+//			return new Role();
+//		}
+//	}
 	
 	@RequiresPermissions("sys:role:view")
 	@RequestMapping(value = {"list", ""})
+	@ResponseBody
 	public String list(Role role, Model model) {
 		List<Role> list = systemService.findAllRole();
-		model.addAttribute("list", list);
-		return "modules/sys/roleList";
+		return  new Ret().putMap("data",list).toString();
 	}
 
 	@RequiresPermissions("sys:role:view")
@@ -78,51 +79,41 @@ public class RoleController extends BaseController {
 	
 	@RequiresPermissions("sys:role:edit")
 	@RequestMapping(value = "save")
+	@ResponseBody
 	public String save(Role role, Model model, RedirectAttributes redirectAttributes) {
 		if(!UserUtils.getUser().isAdmin()&&role.getSysData().equals(Global.YES)){
-			addMessage(redirectAttributes, "越权操作，只有超级管理员才能修改此数据！");
-			return "redirect:" + adminPath + "/sys/role/?repage";
+			return new Ret(1,"越权操作，只有超级管理员才能修改此数据！").toString();
 		}
 		if(Global.isDemoMode()){
-			addMessage(redirectAttributes, "演示模式，不允许操作！");
-			return "redirect:" + adminPath + "/sys/role/?repage";
+			return new Ret(1,"演示模式，不允许操作！").toString();
 		}
 		if (!beanValidator(model, role)){
-			return form(role, model);
+			return new Ret(1,model.asMap().toString()).toString();
 		}
+
 		if (!"true".equals(checkName(role.getOldName(), role.getName()))){
-			addMessage(model, "保存角色'" + role.getName() + "'失败, 角色名已存在");
-			return form(role, model);
+			return new Ret(1,"保存角色'" + role.getName() + "'失败, 角色名已存在").toString();
 		}
 		if (!"true".equals(checkEnname(role.getOldEnname(), role.getEnname()))){
-			addMessage(model, "保存角色'" + role.getName() + "'失败, 英文名已存在");
-			return form(role, model);
+			return new Ret(1,"保存角色'" + role.getName() + "'失败, 英文名已存在").toString();
 		}
 		systemService.saveRole(role);
-		addMessage(redirectAttributes, "保存角色'" + role.getName() + "'成功");
-		return "redirect:" + adminPath + "/sys/role/?repage";
+		return  new Ret().putMap("data",role).toString();
 	}
 	
 	@RequiresPermissions("sys:role:edit")
 	@RequestMapping(value = "delete")
+	@ResponseBody
 	public String delete(Role role, RedirectAttributes redirectAttributes) {
 		if(!UserUtils.getUser().isAdmin() && role.getSysData().equals(Global.YES)){
-			addMessage(redirectAttributes, "越权操作，只有超级管理员才能修改此数据！");
-			return "redirect:" + adminPath + "/sys/role/?repage";
+			return new Ret(1,"越权操作，只有超级管理员才能修改此数据！").toString();
+
 		}
 		if(Global.isDemoMode()){
-			addMessage(redirectAttributes, "演示模式，不允许操作！");
-			return "redirect:" + adminPath + "/sys/role/?repage";
+			return new Ret(1,"演示模式，不允许操作！").toString();
 		}
-//		if (Role.isAdmin(id)){
-//			addMessage(redirectAttributes, "删除角色失败, 不允许内置角色或编号空");
-////		}else if (UserUtils.getUser().getRoleIdList().contains(id)){
-////			addMessage(redirectAttributes, "删除角色失败, 不能删除当前用户所在角色");
-//		}else{
-			systemService.deleteRole(role);
-			addMessage(redirectAttributes, "删除角色成功");
-//		}
-		return "redirect:" + adminPath + "/sys/role/?repage";
+		systemService.deleteRole(role);
+		return new Ret(0,"删除角色成功").toString();
 	}
 	
 	/**
@@ -275,5 +266,10 @@ public class RoleController extends BaseController {
 		}
 		return "false";
 	}
-
+	@RequiresPermissions("sys:role:view")
+	@ResponseBody
+	@RequestMapping(value = "roleList")
+	public String roleList( HttpServletResponse response) {
+		return new Ret().putMap("roleList",systemService.findAllRole()).toString();
+	}
 }
