@@ -49,16 +49,12 @@ public class ${ClassName}Controller extends BaseController {
 	@RequiresPermissions("${permissionPrefix}:edit")
 	@RequestMapping(value = "save")
 	@ResponseBody
-	public String save(@RequestParam(required=true) String json, Model model, RedirectAttributes redirectAttributes) {
-		${ClassName} ${className}=null;
-		Map<String, Object> data = null;
-		if (StringUtils.isNotBlank(json)){
-				json=StringEscapeUtils.unescapeHtml4(json);
-				${className}=gson.fromJson(json, ${ClassName}.class);
-				data = gson.fromJson(json, Map.class);
+	public String save(@RequestParam${ClassName} ${className}, Model model) {
 
-		}
+		${ClassName} ${className}==gson.fromJson(json, ${ClassName}.class);
+
 		${className}.setDelFlag(DataEntity.DEL_FLAG_NORMAL);
+
 		if (!beanValidator(model, ${className})){
 			return new Ret(1, model.asMap().get("message").toString()).toString();
 		}
