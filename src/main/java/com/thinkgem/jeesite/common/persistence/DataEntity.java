@@ -68,7 +68,7 @@ public abstract class DataEntity<T> extends BaseEntity<T> {
 		}
 		this.updateDate = new Date();
 	}
-	
+	@JsonIgnore
 	@Length(min=0, max=255)
 	public String getRemarks() {
 		return remarks;
@@ -86,7 +86,7 @@ public abstract class DataEntity<T> extends BaseEntity<T> {
 	public void setCreateBy(User createBy) {
 		this.createBy = createBy;
 	}
-
+	@JsonIgnore
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	public Date getCreateDate() {
 		return createDate;
@@ -104,7 +104,7 @@ public abstract class DataEntity<T> extends BaseEntity<T> {
 	public void setUpdateBy(User updateBy) {
 		this.updateBy = updateBy;
 	}
-
+	@JsonIgnore
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	public Date getUpdateDate() {
 		return updateDate;

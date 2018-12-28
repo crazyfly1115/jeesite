@@ -31,6 +31,7 @@ public class Menu extends DataEntity<Menu> {
 	private String isShow; 	// 是否在菜单中显示（1：显示；0：不显示）
 	private String permission; // 权限标识
 	private String isButton;//是否按钮，
+	private String template;//前端模板地址
 	
 	private String userId;
 	
@@ -179,5 +180,13 @@ public class Menu extends DataEntity<Menu> {
 
 	public void setIsButton(String isButton) {
 		this.isButton = isButton;
+	}
+	@Length(min=1, max=200)
+	public String getTemplate() {
+		return template;
+	}
+
+	public void setTemplate(String template) {
+		this.template = template;
 	}
 }

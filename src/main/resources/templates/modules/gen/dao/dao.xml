@@ -4,9 +4,6 @@
 	<filePath>src/main/java/${packageName}/${moduleName}/dao/${subModuleName}</filePath>
 	<fileName>${ClassName}Dao.java</fileName>
 	<content><![CDATA[
-/**
- * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
- */
 package ${packageName}.${moduleName}.dao<#if subModuleName != "">.${subModuleName}</#if>;
 
 import com.thinkgem.jeesite.common.persistence.CrudDao;
@@ -17,6 +14,7 @@ import ${packageName}.${moduleName}.entity<#if subModuleName != "">.${subModuleN
  * ${functionName}DAO接口
  * @author ${functionAuthor}
  * @version ${functionVersion}
+ * 尚渝网络
  */
 @MyBatisDao
 public interface ${ClassName}Dao extends CrudDao<${ClassName}> {

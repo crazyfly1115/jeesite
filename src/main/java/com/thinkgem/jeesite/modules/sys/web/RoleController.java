@@ -70,13 +70,23 @@ public class RoleController extends BaseController {
 	public String form(Role role, Model model) {
 		if (role.getOffice()==null){
 			role.setOffice(UserUtils.getUser().getOffice());
-		}
+	}
 		model.addAttribute("role", role);
 		model.addAttribute("menuList", systemService.findAllMenu());
 		model.addAttribute("officeList", officeService.findAll());
 		return "modules/sys/roleForm";
 	}
-	
+	@RequiresPermissions("sys:role:view")
+	@RequestMapping(value = {"getById"})
+	@ResponseBody
+	public String getById(@RequestParam(required = true) String id) {
+
+		Role role =systemService.getRole(id);
+		if(role==null){
+			return new Ret(1, "未查询到数据").toString();
+		}
+		return new Ret("data",role).toString();
+	}
 	@RequiresPermissions("sys:role:edit")
 	@RequestMapping(value = "save")
 	@ResponseBody

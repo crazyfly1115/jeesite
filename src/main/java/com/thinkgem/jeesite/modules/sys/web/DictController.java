@@ -3,12 +3,16 @@
  */
 package com.thinkgem.jeesite.modules.sys.web;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.RegEx;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.thinkgem.jeesite.common.bean.Ret;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -39,58 +43,40 @@ public class DictController extends BaseController {
 
 	@Autowired
 	private DictService dictService;
-	
-	@ModelAttribute
-	public Dict get(@RequestParam(required=false) String id) {
-		if (StringUtils.isNotBlank(id)){
-			return dictService.get(id);
-		}else{
-			return new Dict();
-		}
-	}
-	
+
 	@RequiresPermissions("sys:dict:view")
-	@RequestMapping(value = {"list", ""})
+	@RequestMapping(value = {"list"})
+	@ResponseBody
 	public String list(Dict dict, HttpServletRequest request, HttpServletResponse response, Model model) {
 		List<String> typeList = dictService.findTypeList();
-		model.addAttribute("typeList", typeList);
-        Page<Dict> page = dictService.findPage(new Page<Dict>(request, response), dict); 
-        model.addAttribute("page", page);
-		return "modules/sys/dictList";
+        Page<Dict> page = dictService.findPage(new Page<Dict>(request, response), dict);
+		return  new Ret().putMap("data",page).putMap("typeList",typeList).toString();
 	}
 
-	@RequiresPermissions("sys:dict:view")
-	@RequestMapping(value = "form")
-	public String form(Dict dict, Model model) {
-		model.addAttribute("dict", dict);
-		return "modules/sys/dictForm";
-	}
 
 	@RequiresPermissions("sys:dict:edit")
-	@RequestMapping(value = "save")//@Valid 
+	@RequestMapping(value = "save")
+	@ResponseBody
 	public String save(Dict dict, Model model, RedirectAttributes redirectAttributes) {
 		if(Global.isDemoMode()){
-			addMessage(redirectAttributes, "演示模式，不允许操作！");
-			return "redirect:" + adminPath + "/sys/dict/?repage&type="+dict.getType();
+			return new Ret(1,"演示模式，不允许操作！").toString();
 		}
 		if (!beanValidator(model, dict)){
-			return form(dict, model);
+			return new Ret(1,model.asMap().toString()).toString();
 		}
 		dictService.save(dict);
-		addMessage(redirectAttributes, "保存字典'" + dict.getLabel() + "'成功");
-		return "redirect:" + adminPath + "/sys/dict/?repage&type="+dict.getType();
+		return  new Ret().putMap("data",dict).toString();
 	}
 	
 	@RequiresPermissions("sys:dict:edit")
 	@RequestMapping(value = "delete")
+	@ResponseBody
 	public String delete(Dict dict, RedirectAttributes redirectAttributes) {
 		if(Global.isDemoMode()){
-			addMessage(redirectAttributes, "演示模式，不允许操作！");
-			return "redirect:" + adminPath + "/sys/dict/?repage";
+			return new Ret(1,"演示模式，不允许操作！").toString();
 		}
 		dictService.delete(dict);
-		addMessage(redirectAttributes, "删除字典成功");
-		return "redirect:" + adminPath + "/sys/dict/?repage&type="+dict.getType();
+		return new Ret(0,"删除成功").toString();
 	}
 	
 	@RequiresPermissions("user")
@@ -111,13 +97,44 @@ public class DictController extends BaseController {
 		}
 		return mapList;
 	}
-	
+	/**
+	 * @Author zhangsy
+	 * @Description  获取字典数据，不传类型获取全部数据
+	 * @Date 15:59 2018/12/27
+	 * @Param [type]
+	 * @return java.util.List<com.thinkgem.jeesite.modules.sys.entity.Dict>
+	 * @Company 重庆尚渝网络科技
+	 * @version v1000
+	 **/
 	@ResponseBody
 	@RequestMapping(value = "listData")
-	public List<Dict> listData(@RequestParam(required=false) String type) {
-		Dict dict = new Dict();
-		dict.setType(type);
-		return dictService.findList(dict);
+	public String  listData(@RequestParam(required=false) String type) {
+
+			Dict dict = new Dict();
+			List<Dict> datalist=dictService.findList(dict);//数据
+			//{ type:[{value:xz,lable:xx,sort:xx}]}
+			Map<String,List<Map>> map=new HashMap<String, List<Map>>();
+
+			for (Dict t:datalist){
+				Map mt=new HashMap();
+				mt.put("value",t.getValue());
+				mt.put("label",t.getLabel());
+				mt.put("type",t.getType());
+				mt.put("sort",t.getSort());
+				if(map.containsKey(t.getType())){
+
+					map.get(t.getType()).add(mt);
+				}else{
+					List mtlist=new ArrayList<Map>();
+					mtlist.add(mt);
+					map.put(t.getType(),mtlist);
+				}
+			}
+		if(StringUtils.isBlank(type)){
+			return  new  Ret().putMap("data",map).toString();
+		}else{
+			return  new  Ret().putMap("data",map.get(type)).toString();
+		}
 	}
 
 }

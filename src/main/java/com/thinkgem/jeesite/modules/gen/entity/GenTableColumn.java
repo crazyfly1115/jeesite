@@ -5,6 +5,7 @@ package com.thinkgem.jeesite.modules.gen.entity;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.validator.constraints.Length;
 
 import com.google.common.collect.Lists;
@@ -20,17 +21,39 @@ public class GenTableColumn extends DataEntity<GenTableColumn> {
 	
 	private static final long serialVersionUID = 1L;
 	private GenTable genTable;	// 归属表
+	//字段属性
 	private String name; 		// 列名
 	private String comments;	// 描述
 	private String jdbcType;	// JDBC类型
 	private String javaType;	// JAVA类型
 	private String javaField;	// JAVA字段名
-	private String isPk;		// 是否主键（1：主键）
-	private String isNull;		// 是否可为空（1：可为空；0：不为空）
 	private String isInsert;	// 是否为插入字段（1：插入字段）
 	private String isEdit;		// 是否编辑字段（1：编辑字段）
+	private String isPk;		// 是否主键（1：主键）
+	private String isNull;		// 是否可为空（1：可为空；0：不为空）
+
+
 	private String isList;		// 是否列表字段（1：列表字段）
+
 	private String isQuery;		// 是否查询字段（1：查询字段）
+
+	//列表字段
+
+	private String isListShow; //列表是否显示
+
+	//编辑页面
+	private String isAddShow;//新增显示
+	private String isAddEdit;//是否新增能录入
+
+	private String isEditShow;//编辑显示
+	private String isEditEdit;//编辑是否能编辑
+
+
+	private String tableLogicName;//关联表的逻辑字段 类似 a.showName  join tableName.tableLoginName=column
+	private String tableShowName;//关联表的显示字段
+	private String tableName;//关联表的表名,
+
+
 	private String queryType;	// 查询方式（等于、不等于、大于、小于、范围、左LIKE、右LIKE、左右LIKE）
 	private String showType;	// 字段生成方案（文本框、文本域、下拉框、复选框、单选框、字典选择、人员选择、部门选择、区域选择）
 	private String dictType;	// 字典类型
@@ -47,7 +70,7 @@ public class GenTableColumn extends DataEntity<GenTableColumn> {
 	public GenTableColumn(GenTable genTable){
 		this.genTable = genTable;
 	}
-
+	@JsonIgnore
 	public GenTable getGenTable() {
 		return genTable;
 	}
@@ -177,6 +200,70 @@ public class GenTableColumn extends DataEntity<GenTableColumn> {
 		this.sort = sort;
 	}
 
+	public String getIsListShow() {
+		return isListShow;
+	}
+
+	public void setIsListShow(String isListShow) {
+		this.isListShow = isListShow;
+	}
+
+	public String getIsAddShow() {
+		return isAddShow;
+	}
+
+	public void setIsAddShow(String isAddShow) {
+		this.isAddShow = isAddShow;
+	}
+
+	public String getIsAddEdit() {
+		return isAddEdit;
+	}
+
+	public void setIsAddEdit(String isAddEdit) {
+		this.isAddEdit = isAddEdit;
+	}
+
+	public String getIsEditShow() {
+		return isEditShow;
+	}
+
+	public void setIsEditShow(String isEditShow) {
+		this.isEditShow = isEditShow;
+	}
+
+	public String getIsEditEdit() {
+		return isEditEdit;
+	}
+
+	public void setIsEditEdit(String isEditEdit) {
+		this.isEditEdit = isEditEdit;
+	}
+
+	public String getTableLogicName() {
+		return tableLogicName;
+	}
+
+	public void setTableLogicName(String tableLogicName) {
+		this.tableLogicName = tableLogicName;
+	}
+
+	public String getTableShowName() {
+		return tableShowName;
+	}
+
+	public void setTableShowName(String tableShowName) {
+		this.tableShowName = tableShowName;
+	}
+
+	public String getTableName() {
+		return tableName;
+	}
+
+	public void setTableName(String tableName) {
+		this.tableName = tableName;
+	}
+
 	/**
 	 * 获取列名和说明
 	 * @return
@@ -255,6 +342,7 @@ public class GenTableColumn extends DataEntity<GenTableColumn> {
 	 * 获取列注解列表
 	 * @return
 	 */
+	@JsonIgnore
 	public List<String> getAnnotationList(){
 		List<String> list = Lists.newArrayList();
 		// 导入Jackson注解
@@ -283,6 +371,7 @@ public class GenTableColumn extends DataEntity<GenTableColumn> {
 	 * 获取简写列注解列表
 	 * @return
 	 */
+	@JsonIgnore
 	public List<String> getSimpleAnnotationList(){
 		List<String> list = Lists.newArrayList();
 		for (String ann : getAnnotationList()){
@@ -295,6 +384,7 @@ public class GenTableColumn extends DataEntity<GenTableColumn> {
 	 * 是否是基类字段
 	 * @return
 	 */
+	@JsonIgnore
 	public Boolean getIsNotBaseField(){
 		return !StringUtils.equals(getSimpleJavaField(), "id")
 				&& !StringUtils.equals(getSimpleJavaField(), "remarks")

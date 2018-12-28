@@ -103,12 +103,31 @@
 					<legend>字段列表</legend>
 					<div class="control-group">
 						<table id="contentTable" class="table table-striped table-bordered table-condensed">
-							<thead><tr><th title="数据库字段名">列名</th><th title="默认读取数据库字段备注">说明</th><th title="数据库中设置的字段类型及长度">物理类型</th><th title="实体对象的属性字段类型">Java类型</th>
+							<thead><tr>
+								<th title="数据库字段名">列名</th><th title="默认读取数据库字段备注">说明</th>
+								<th title="数据库中设置的字段类型及长度">物理类型</th>
+								<th title="实体对象的属性字段类型">Java类型</th>
 								<th title="实体对象的属性字段（对象名.属性名|属性名2|属性名3，例如：用户user.id|name|loginName，属性名2和属性名3为Join时关联查询的字段）">Java属性名称 <i class="icon-question-sign"></i></th>
-								<th title="是否是数据库主键">主键</th><th title="字段是否可为空值，不可为空字段自动进行空值验证">可空</th><th title="选中后该字段被加入到insert语句里">插入</th>
-								<th title="选中后该字段被加入到update语句里">编辑</th><th title="选中后该字段被加入到查询列表里">列表</th>
-								<th title="选中后该字段被加入到查询条件里">查询</th><th title="该字段为查询字段时的查询匹配放松">查询匹配方式</th>
-								<th title="字段在表单中显示的类型">显示表单类型</th><th title="显示表单类型设置为“下拉框、复选框、点选框”时，需设置字典的类型">字典类型</th><th>排序</th></tr></thead>
+								<th title="是否是数据库主键">主键</th><th title="字段是否可为空值，不可为空字段自动进行空值验证">可空</th>
+								<th title="选中后该字段被加入到insert语句里">插入</th>
+								<th title="选中后该字段被加入到update语句里">编辑</th>
+								<th title="选中后该字段被加入到查询列表里">列表</th>
+								<th title="选中后该字段被加入到查询条件里">查询</th>
+								<th title="该字段为查询字段时的查询匹配放松">查询匹配方式</th>
+								<th title="字段在表单中显示的类型">显示表单类型</th>
+								<th title="显示表单类型设置为“下拉框、复选框、点选框”时，需设置字典的类型">字典类型</th>
+								<th>列表显示</th>
+								<th>新增显示</th>
+								<th>新增录入</th>
+								<th>编辑显示</th>
+								<th>编辑录入</th>
+
+								<th>关联表关联字段</th>
+								<th>关联表显示字段</th>
+								<th title="配置该字段对应外表的关联表,类似子选父表,要显示父的名称 id作为关联,name作为显示">关联表<i class="icon-question-sign"></th>
+
+
+								<th>排序</th></tr></thead>
 							<tbody>
 							<c:forEach items="${genTable.columnList}" var="column" varStatus="vs">
 								<tr${column.delFlag eq '1'?' class="error" title="已删除的列，保存之后消失！"':''}>
@@ -168,6 +187,33 @@
 									</td>
 									<td>
 										<input type="text" name="columnList[${vs.index}].dictType" value="${column.dictType}" maxlength="200" class="input-mini"/>
+									</td>
+									<td>
+										<input type="checkbox" name="columnList[${vs.index}].isListShow" value="1" ${column.isListShow eq '1' ? 'checked' : ''}/>
+									</td>
+									<td>
+										<input type="checkbox" name="columnList[${vs.index}].isAddShow" value="1" ${column.isAddShow eq '1' ? 'checked' : ''}/>
+									</td>
+									<td>
+										<input type="checkbox" name="columnList[${vs.index}].isAddEdit" value="1" ${column.isAddEdit eq '1' ? 'checked' : ''}/>
+									</td>
+									<td>
+										<input type="checkbox" name="columnList[${vs.index}].isEditShow" value="1" ${column.isEditShow eq '1' ? 'checked' : ''}/>
+									</td>
+									<td>
+										<input type="checkbox" name="columnList[${vs.index}].isEditEdit" value="1" ${column.isEditEdit eq '1' ? 'checked' : ''}/>
+									</td>
+
+
+
+									<td>
+										<input type="text" name="columnList[${vs.index}].tableLogicName" value="${column.tableLogicName}" maxlength="200" class=" input-min"/>
+									</td>
+									<td>
+										<input type="text" name="columnList[${vs.index}].tableShowName" value="${column.tableShowName}" maxlength="200" class=" input-min"/>
+									</td>
+									<td>
+										<input type="text" name="columnList[${vs.index}].tableName" value="${column.tableName}" maxlength="200" class=" input-min"/>
 									</td>
 									<td>
 										<input type="text" name="columnList[${vs.index}].sort" value="${column.sort}" maxlength="200" class="required input-min digits"/>

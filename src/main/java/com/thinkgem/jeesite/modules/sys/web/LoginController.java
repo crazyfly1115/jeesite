@@ -39,7 +39,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @version 2013-5-31
  */
 @Controller
-public class LoginController extends BaseController{
+public class
+LoginController extends BaseController{
 	
 	@Autowired
 	private SessionDAO sessionDAO;
@@ -276,4 +277,5 @@ public class LoginController extends BaseController{
 //
 //		return "modules/sys/sysIndex";
 	}
+
 }

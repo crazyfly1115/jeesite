@@ -94,24 +94,33 @@ public class UserController extends BaseController {
 		}
 		return new Ret().putMap("user",user).toString();
 	}
+	@RequiresPermissions("sys:user:view")
+	@RequestMapping(value = {"getById"})
+	@ResponseBody
+	public String getById(@RequestParam(required = true) String id) {
 
+		User user =systemService.getUser(id);
+		if(user==null){
+			return new Ret(1, "未查询到数据").toString();
+		}
+		return new Ret("data",user).toString();
+	}
 	@RequiresPermissions("sys:user:edit")
 	@RequestMapping(value = "save")
 	@ResponseBody
-	public String save(User user, HttpServletRequest request, Model model, RedirectAttributes redirectAttributes) {
+	public String save(String json,Model model) {
+		User user=gson.fromJson(json,User.class);
 		if(Global.isDemoMode()){
 			return new  Ret(1,"演示模式，不允许操作！").toString();
 		}
 		// 修正引用赋值问题，不知道为何，Company和Office引用的一个实例地址，修改了一个，另外一个跟着修改。
-		user.setCompany(new Office(request.getParameter("company.id")));
-		user.setOffice(new Office(request.getParameter("office.id")));
+//		user.setCompany(new Office(request.getParameter("company.id")));
+//		user.setOffice(new Office(request.getParameter("office.id")));
 		// 如果新密码为空，则不更换密码
 		if (StringUtils.isNotBlank(user.getNewPassword())) {
 			user.setPassword(SystemService.entryptPassword(user.getNewPassword()));
 		}
-		if (!beanValidator(model, user)){
-			return  new Ret(1,model.asMap().toString()).toString();
-		}
+		beanValidator(user);
 		if (!"true".equals(checkLoginName(user.getOldLoginName(), user.getLoginName()))){
 //			addMessage(model, "保存用户'" + user.getLoginName() + "'失败，登录名已存在");
 //			return form(user, model);
@@ -135,7 +144,7 @@ public class UserController extends BaseController {
 		}
 //		addMessage(redirectAttributes, "保存用户'" + user.getLoginName() + "'成功");
 //		return "redirect:" + adminPath + "/sys/user/list?repage";
-		return new Ret(0,"保存用户'" + user.getLoginName() + "'成功").putMap("user",user).toString();
+		return new Ret(0,"保存用户'" + user.getLoginName() + "'成功").putMap("data",user).toString();
 	}
 	
 	@RequiresPermissions("sys:user:edit")

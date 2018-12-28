@@ -5,6 +5,7 @@ package com.thinkgem.jeesite.common.web;
 
 import java.beans.PropertyEditorSupport;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -16,6 +17,10 @@ import javax.validation.Validator;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.thinkgem.jeesite.common.bean.Ret;
+import com.thinkgem.jeesite.modules.gen.dao.GenTableColumnDao;
+import com.thinkgem.jeesite.modules.gen.dao.GenTableDao;
+import com.thinkgem.jeesite.modules.gen.entity.GenTable;
+import com.thinkgem.jeesite.modules.gen.entity.GenTableColumn;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.slf4j.Logger;
@@ -72,6 +77,12 @@ public abstract class BaseController {
 	@Autowired
 	protected Validator validator;
 
+	protected  String  MsgSuccess="保存成功";
+	protected  String  MsgFial="保存失败";
+	protected  String  MsgDeleteSuccess="删除成功";
+	protected  String  MsgDataNotFinad="未查询到数据";
+	protected  String  MsgReqNotNull="请求参数不能为空";
+
 	/**
 	 * 服务端参数有效性验证
 	 * @param object 验证的实体对象
@@ -89,7 +100,7 @@ public abstract class BaseController {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * 服务端参数有效性验证
 	 * @param object 验证的实体对象
@@ -200,6 +211,14 @@ public abstract class BaseController {
 		logger.error("数据库异常:违反主键约束",e);
 		return new Ret(1,"数据库:该值已经存在!").toString();
 	}
+
+
+	@ExceptionHandler({ConstraintViolationException.class})
+	@ResponseBody
+	public String ConstraintViolationException(ConstraintViolationException e){
+		List<String> list = BeanValidators.extractPropertyAndMessageAsList(e, ": ");
+		return new Ret(1,"数据验证失败："+list.toArray(new String[]{})).toString();
+	}
 	
 	/**
 	 * 授权登录异常
@@ -246,5 +265,42 @@ public abstract class BaseController {
 //			}
 		});
 	}
-	
+
+
+
+
+	/**
+	 * @Author zhangsy
+	 * @Description  根据GenTableId 获取配置信息
+	 * @Date 15:25 2018/12/27
+	 * @Param
+	 * @return
+	 * @Company 重庆尚渝网络科技
+	 * @version v1000
+	 **/
+
+	@Autowired
+	private GenTableDao genTableDao;
+	@Autowired
+	private GenTableColumnDao genTableColumnDao;
+	public  GenTable getDataBaseConfig(String genTableId){
+		GenTable genTable = genTableDao.get(genTableId);
+		List<GenTableColumn> list=genTableColumnDao.findList(new GenTableColumn(new GenTable(genTable.getId())));
+		List<GenTableColumn> notadd=new ArrayList<GenTableColumn>();
+		for (GenTableColumn gt:list){
+//			gt.setId("");
+			if(!gt.getIsNotBaseField()){
+				notadd.add(gt);
+			}
+
+		}
+		list.removeAll(notadd);
+		genTable.setColumnList(list);
+		//置空数据
+
+
+
+
+		return genTable;
+	}
 }

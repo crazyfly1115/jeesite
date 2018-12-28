@@ -3,6 +3,8 @@
  */
 package com.thinkgem.jeesite.common.persistence;
 
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**
@@ -71,7 +73,14 @@ public interface CrudDao<T> extends BaseDao {
 	 */
 	@Deprecated
 	public int delete(String id);
-	
+	/**
+	 * 删除数据（一般为逻辑删除，更新del_flag字段为1）
+	 * @param id
+	 * @see public int delete(T entity)
+	 * @return
+	 */
+
+	public int deleteById(@Param("id")String id,@Param("DEL_FLAG_DELETE")String DEL_FLAG_DELETE);
 	/**
 	 * 删除数据（一般为逻辑删除，更新del_flag字段为1）
 	 * @param entity

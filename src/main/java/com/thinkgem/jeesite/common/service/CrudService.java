@@ -89,4 +89,16 @@ public abstract class CrudService<D extends CrudDao<T>, T extends DataEntity<T>>
 		dao.delete(entity);
 	}
 
+
+	@Transactional(readOnly = false)
+	public void deleteById(String id) {
+		dao.deleteById(id, DataEntity.DEL_FLAG_DELETE);
+	}
+	@Transactional(readOnly = false)
+	public void deleteByIds(String[] ids) {
+		for (String id:ids){
+			dao.deleteById(id, DataEntity.DEL_FLAG_DELETE);
+		}
+	}
+
 }

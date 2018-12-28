@@ -179,7 +179,7 @@ public class UserUtils {
 	public static  List<VueTreeDTO> getMenuListTree(){
 		List<VueTreeDTO> mapList = Lists.newArrayList();
 		for (Menu e:getMenuList()){
-			VueTreeDTO v=new VueTreeDTO(e.getName(), e.getParentId(), e.getId(),e.getHref(),e.getIcon());
+			VueTreeDTO v=new VueTreeDTO(e.getName(), e.getParentId(), e.getId(),e.getHref(),e.getIcon(),e.getIsButton());
 			mapList.add(v);
 		}
 		return 	TreeUtil.List2Tree(mapList);
