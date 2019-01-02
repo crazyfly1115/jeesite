@@ -25,6 +25,18 @@ public class GenTable extends DataEntity<GenTable> {
 	private String parentTable;		// 关联父表
 	private String parentTableFk;		// 关联父表外键
 
+	private String category;//分类
+	private String packageName;		// 生成包路径
+	private String moduleName;		// 生成模块名
+	private String subModuleName;		// 生成子模块名
+	private String functionName;		// 生成功能名
+	private String functionNameSimple;		// 生成功能名（简写）
+	private String functionAuthor;		// 生成功能作者
+
+
+	private String flag; 	// 0：保存方案； 1：保存方案并生成代码
+
+
 	private List<GenTableColumn> columnList = Lists.newArrayList();	// 表列
 
 	private String nameLike; 	// 按名称模糊查询
@@ -212,6 +224,72 @@ public class GenTable extends DataEntity<GenTable> {
 		}
 		return false;
 	}
+
+
+	public String getPackageName() {
+		return packageName;
+	}
+
+	public void setPackageName(String packageName) {
+		this.packageName = packageName;
+	}
+
+	public String getModuleName() {
+		return moduleName;
+	}
+
+	public void setModuleName(String moduleName) {
+		this.moduleName = moduleName;
+	}
+
+	public String getSubModuleName() {
+		return subModuleName;
+	}
+
+	public void setSubModuleName(String subModuleName) {
+		this.subModuleName = subModuleName;
+	}
+
+	public String getFunctionName() {
+		return functionName;
+	}
+
+	public void setFunctionName(String functionName) {
+		this.functionName = functionName;
+	}
+
+	public String getFunctionNameSimple() {
+		return functionNameSimple;
+	}
+
+	public void setFunctionNameSimple(String functionNameSimple) {
+		this.functionNameSimple = functionNameSimple;
+	}
+
+	public String getFunctionAuthor() {
+		return functionAuthor;
+	}
+
+	public void setFunctionAuthor(String functionAuthor) {
+		this.functionAuthor = functionAuthor;
+	}
+
+	public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
+	}
+
+	public String getFlag() {
+		return flag;
+	}
+
+	public void setFlag(String flag) {
+		this.flag = flag;
+	}
+
 }
 
 

@@ -21,7 +21,7 @@ public class CORSFilter implements Filter {
         HttpServletResponse res = (HttpServletResponse) response;
         HttpServletRequest  req=(HttpServletRequest) request;
 
-        String []  allowDomain= {"http://trackapp.com:1990","http://sftpw-img.heikuai.com:8000"};
+        String []  allowDomain= {"http://trackapp.com:1990","http://sftpw-img.heikuai.com:8000","http://113.204.4.250:8000"};
         Set<String> allowedOrigins= new HashSet<String>(Arrays.asList(allowDomain));
         String originHeader=((HttpServletRequest) req).getHeader("Origin");
         if (allowedOrigins.contains(originHeader)) {

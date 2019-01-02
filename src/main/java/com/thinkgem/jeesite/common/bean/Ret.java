@@ -3,7 +3,10 @@ package com.thinkgem.jeesite.common.bean;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.thinkgem.jeesite.common.mapper.JsonMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 封装返回的类
@@ -12,6 +15,8 @@ import com.thinkgem.jeesite.common.mapper.JsonMapper;
  *
  */
 public class Ret {
+
+    protected Logger logger = LoggerFactory.getLogger(getClass());
     private int ret = 0;
     private String msg = "";
     private String errCode;//错误代码
@@ -89,6 +94,10 @@ public class Ret {
 //			e.printStackTrace();
 //		}
 //		System.out.println(JsonMapper.toJsonString(this));
-        return  JsonMapper.toJsonString(this);
+        String json=new JsonMapper(JsonInclude.Include.ALWAYS).toJson(this);
+        if (logger.isDebugEnabled()){
+            logger.debug("返回参数:{}",json);
+        }
+        return  json;
     }
 }

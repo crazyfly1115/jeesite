@@ -62,56 +62,57 @@ public class GenSchemeService extends BaseService {
 			genSchemeDao.update(genScheme);
 		}
 		// 生成代码
-		if ("1".equals(genScheme.getFlag())){
-			return generateCode(genScheme);
-		}
+//		if ("1".equals(genScheme.getFlag())){
+////			return generateCode(genScheme);
+//		}
 		return "";
 	}
-	
+	//取消模板计划  改为表生成
+	@Deprecated
 	@Transactional(readOnly = false)
 	public void delete(GenScheme genScheme) {
 		genSchemeDao.delete(genScheme);
 	}
 	
-	private String generateCode(GenScheme genScheme){
-
-		StringBuilder result = new StringBuilder();
-		
-		// 查询主表及字段列
-		GenTable genTable = genTableDao.get(genScheme.getGenTable().getId());
-		genTable.setColumnList(genTableColumnDao.findList(new GenTableColumn(new GenTable(genTable.getId()))));
-		
-		// 获取所有代码模板
-		GenConfig config = GenUtils.getConfig();
-		
-		// 获取模板列表
-		List<GenTemplate> templateList = GenUtils.getTemplateList(config, genScheme.getCategory(), false);
-		List<GenTemplate> childTableTemplateList = GenUtils.getTemplateList(config, genScheme.getCategory(), true);
-		
-		// 如果有子表模板，则需要获取子表列表
-		if (childTableTemplateList.size() > 0){
-			GenTable parentTable = new GenTable();
-			parentTable.setParentTable(genTable.getName());
-			genTable.setChildList(genTableDao.findList(parentTable));
-		}
-		
-		// 生成子表模板代码
-		for (GenTable childTable : genTable.getChildList()){
-			childTable.setParent(genTable);
-			childTable.setColumnList(genTableColumnDao.findList(new GenTableColumn(new GenTable(childTable.getId()))));
-			genScheme.setGenTable(childTable);
-			Map<String, Object> childTableModel = GenUtils.getDataModel(genScheme);
-			for (GenTemplate tpl : childTableTemplateList){
-				result.append(GenUtils.generateToFile(tpl, childTableModel, genScheme.getReplaceFile()));
-			}
-		}
-		
-		// 生成主表模板代码
-		genScheme.setGenTable(genTable);
-		Map<String, Object> model = GenUtils.getDataModel(genScheme);
-		for (GenTemplate tpl : templateList){
-			result.append(GenUtils.generateToFile(tpl, model, genScheme.getReplaceFile()));
-		}
-		return result.toString();
-	}
+//	private String generateCode(GenScheme genScheme){
+//
+//		StringBuilder result = new StringBuilder();
+//
+//		// 查询主表及字段列
+//		GenTable genTable = genTableDao.get(genScheme.getGenTable().getId());
+//		genTable.setColumnList(genTableColumnDao.findList(new GenTableColumn(new GenTable(genTable.getId()))));
+//
+//		// 获取所有代码模板
+//		GenConfig config = GenUtils.getConfig();
+//
+//		// 获取模板列表
+//		List<GenTemplate> templateList = GenUtils.getTemplateList(config, genScheme.getCategory(), false);
+//		List<GenTemplate> childTableTemplateList = GenUtils.getTemplateList(config, genScheme.getCategory(), true);
+//
+//		// 如果有子表模板，则需要获取子表列表
+//		if (childTableTemplateList.size() > 0){
+//			GenTable parentTable = new GenTable();
+//			parentTable.setParentTable(genTable.getName());
+//			genTable.setChildList(genTableDao.findList(parentTable));
+//		}
+//
+//		// 生成子表模板代码
+//		for (GenTable childTable : genTable.getChildList()){
+//			childTable.setParent(genTable);
+//			childTable.setColumnList(genTableColumnDao.findList(new GenTableColumn(new GenTable(childTable.getId()))));
+//			genScheme.setGenTable(childTable);
+//			Map<String, Object> childTableModel = GenUtils.getDataModel(genScheme);
+//			for (GenTemplate tpl : childTableTemplateList){
+//				result.append(GenUtils.generateToFile(tpl, childTableModel, genScheme.getReplaceFile()));
+//			}
+//		}
+//
+//		// 生成主表模板代码
+//		genScheme.setGenTable(genTable);
+//		Map<String, Object> model = GenUtils.getDataModel(genScheme);
+//		for (GenTemplate tpl : templateList){
+//			result.append(GenUtils.generateToFile(tpl, model, genScheme.getReplaceFile()));
+//		}
+//		return result.toString();
+//	}
 }

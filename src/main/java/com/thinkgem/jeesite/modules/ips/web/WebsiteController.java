@@ -16,7 +16,7 @@ import com.thinkgem.jeesite.modules.ips.service.WebsiteService;
 /**
  * 网站管理Controller
  * @author zhangsy
- * @version 2018-12-27
+ * @version 2018-12-29
  * 尚渝网络
  */
 @Controller
@@ -29,21 +29,28 @@ public class WebsiteController extends BaseController {
 	@RequiresPermissions("ips:website:edit")
 	@RequestMapping(value = "save")
 	@ResponseBody
-	public String save(@RequestBody Website website) {
-	
-		beanValidator(website);
+	public String save(@RequestParam(required = true) String json) {
 
-	    return new Ret(0,"保存网站成功").putMap("data",website).toString();
+		 Website website=gson.fromJson(json, Website.class);
+
+		beanValidator(website);
+	
+		websiteService.save(website);
+
+	    return new Ret(0,MsgSuccess).putMap("data",website).toString();
 	}
 	@RequiresPermissions("ips:website:delete")
 	@RequestMapping(value = "delete")
 	@ResponseBody
-	public String delete(@RequestParam("ids[]") String[] ids) {
+	public String delete(@RequestParam(required = true) String json) {
+
+		String[] ids=gson.fromJson(json,String[].class);
+
 		if(ids==null||ids.length==0){
-			return new Ret(1, "ids为空,无数据").toString();
+			return new Ret(1, MsgReqNotNull).toString();
 		}
 		websiteService.deleteByIds(ids);
-		return new Ret(0, "删除成功").toString();
+		return new Ret(0, MsgDeleteSuccess).toString();
 	}
 
 
@@ -61,7 +68,7 @@ public class WebsiteController extends BaseController {
 
 	    Website website = websiteService.get(id);
 		if(website==null){
-			return new Ret(1, "未查询到数据").toString();
+			return new Ret(1,MsgDataNotFinad).toString();
 		}
 		return new Ret("data",website).toString();
 	}

@@ -4,7 +4,10 @@
 package com.thinkgem.jeesite.modules.gen.service;
 
 import java.util.List;
+import java.util.Map;
 
+import com.thinkgem.jeesite.modules.gen.entity.GenConfig;
+import com.thinkgem.jeesite.modules.gen.entity.GenTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -138,7 +141,7 @@ public class GenTableService extends BaseService {
 	}
 	
 	@Transactional(readOnly = false)
-	public void save(GenTable genTable) {
+	public String save(GenTable genTable) {
 		if (StringUtils.isBlank(genTable.getId())){
 			genTable.preInsert();
 			genTableDao.insert(genTable);
@@ -157,8 +160,50 @@ public class GenTableService extends BaseService {
 				genTableColumnDao.update(column);
 			}
 		}
+		// 生成代码
+		if ("1".equals(genTable.getFlag())){
+			 return generateCode(genTable);
+		}
+		return "";
 	}
-	
+	private String generateCode(GenTable genTable){
+
+		StringBuilder result = new StringBuilder();
+
+		// 查询主表及字段列
+		genTable.setColumnList(genTableColumnDao.findList(new GenTableColumn(new GenTable(genTable.getId()))));
+
+		// 获取所有代码模板
+		GenConfig config = GenUtils.getConfig();
+
+		// 获取模板列表
+		List<GenTemplate> templateList = GenUtils.getTemplateList(config, genTable.getCategory(), false);
+		List<GenTemplate> childTableTemplateList = GenUtils.getTemplateList(config, genTable.getCategory(), true);
+
+		// 如果有子表模板，则需要获取子表列表
+		if (childTableTemplateList.size() > 0){
+			GenTable parentTable = new GenTable();
+			parentTable.setParentTable(genTable.getName());
+			genTable.setChildList(genTableDao.findList(parentTable));
+		}
+
+		// 生成子表模板代码
+		for (GenTable childTable : genTable.getChildList()){
+			childTable.setParent(genTable);
+			childTable.setColumnList(genTableColumnDao.findList(new GenTableColumn(new GenTable(childTable.getId()))));
+			Map<String, Object> childTableModel = GenUtils.getDataModel(genTable);
+			for (GenTemplate tpl : childTableTemplateList){
+				result.append(GenUtils.generateToFile(tpl, childTableModel, true));
+			}
+		}
+
+		// 生成主表模板代码
+		Map<String, Object> model = GenUtils.getDataModel(genTable);
+		for (GenTemplate tpl : templateList){
+			result.append(GenUtils.generateToFile(tpl, model,true));
+		}
+		return result.toString();
+	}
 	@Transactional(readOnly = false)
 	public void delete(GenTable genTable) {
 		genTableDao.delete(genTable);

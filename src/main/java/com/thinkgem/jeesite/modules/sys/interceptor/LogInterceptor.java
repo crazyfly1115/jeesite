@@ -3,11 +3,13 @@
  */
 package com.thinkgem.jeesite.modules.sys.interceptor;
 
+import java.io.*;
 import java.text.SimpleDateFormat;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.thinkgem.jeesite.common.utils.StringUtils;
 import org.springframework.core.NamedThreadLocal;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -34,6 +36,16 @@ public class LogInterceptor extends BaseService implements HandlerInterceptor {
 	        startTimeThreadLocal.set(beginTime);		//线程绑定变量（该数据只有当前请求的线程可见）  
 	        logger.debug("开始计时: {}  URI: {}", new SimpleDateFormat("hh:mm:ss.SSS")
 	        	.format(beginTime), request.getRequestURI());
+
+
+			InputStream is = request.getInputStream ();
+			StringBuilder responseStrBuilder = new StringBuilder ();
+			BufferedReader streamReader = new BufferedReader (new InputStreamReader (is,"UTF-8"));
+			String inputStr;
+			while ((inputStr = streamReader.readLine ()) != null)
+				responseStrBuilder.append (inputStr);
+			String parmeter = responseStrBuilder.toString();
+			logger.debug("请求参数:{},请求URI:{}",parmeter,request.getRequestURI());
 		}
 		return true;
 	}
@@ -64,7 +76,7 @@ public class LogInterceptor extends BaseService implements HandlerInterceptor {
 	        //删除线程变量中的数据，防止内存泄漏
 	        startTimeThreadLocal.remove();
 		}
-		
+
 	}
 
 }

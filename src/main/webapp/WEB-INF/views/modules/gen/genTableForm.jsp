@@ -57,7 +57,7 @@
 		</c:when>
 		<c:otherwise>
 			<form:form id="inputForm" modelAttribute="genTable" action="${ctx}/gen/genTable/save" method="post" class="form-horizontal">
-				<form:hidden path="id"/>
+				<form:hidden path="id"/><form:hidden path="flag"/>
 				<sys:message content="${message}"/>
 				<fieldset>
 					<legend>基本信息</legend>
@@ -77,6 +77,45 @@
 						<label class="control-label">类名:</label>
 						<div class="controls">
 							<form:input path="className" htmlEscape="false" maxlength="200" class="required"/>
+						</div>
+					</div>
+					<div class="control-group">
+						<label class="control-label">模板分类:</label>
+						<div class="controls">
+							<form:select path="category" class="required input-xlarge">
+								<form:options items="${config.categoryList}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+							</form:select>
+							<span class="help-inline">
+					生成结构：{包名}/{模块名}/{分层(dao,entity,service,web)}/{子模块名}/{java类}
+							</span>
+						</div>
+					</div>
+					<div class="control-group">
+						<label class="control-label">包路径:</label>
+						<div class="controls">
+							<form:input path="packageName" htmlEscape="false" maxlength="200" class="required"/>
+						</div>
+					</div>
+					<div class="control-group">
+						<label class="control-label">模块名:</label>
+						<div class="controls">
+							<form:input path="moduleName" htmlEscape="false" maxlength="200" class="required"/>
+						子模块:
+							<form:input path="subModuleName" htmlEscape="false" maxlength="200"/>
+						</div>
+					</div>
+					<div class="control-group">
+						<label class="control-label">功能描述:</label>
+						<div class="controls">
+							<form:input path="functionName" htmlEscape="false" maxlength="200" class="required"/>
+						功能名称
+							<form:input path="functionNameSimple" htmlEscape="false" maxlength="200" class="required"/>
+						</div>
+					</div>
+					<div class="control-group">
+						<label class="control-label"> 作者:</label>
+						<div class="controls">
+							<form:input path="functionAuthor" htmlEscape="false" maxlength="200" class="required"/>
 						</div>
 					</div>
 					<div class="control-group">
@@ -225,7 +264,10 @@
 					</div>
 				</fieldset>
 				<div class="form-actions">
-					<shiro:hasPermission name="gen:genTable:edit"><input id="btnSubmit" class="btn btn-primary" type="submit" value="保 存"/>&nbsp;</shiro:hasPermission>
+					<shiro:hasPermission name="gen:genTable:edit">
+						<input id="btnSubmit" class="btn btn-primary" type="submit" value="保存" onclick="$('#flag').val('0');" />&nbsp;
+						<input id="btnSubmit" class="btn btn-danger" type="submit" value="保存并生成代码" onclick="$('#flag').val('1');"/>&nbsp;
+					</shiro:hasPermission>
 					<input id="btnCancel" class="btn" type="button" value="返 回" onclick="history.go(-1)"/>
 				</div>
 			</form:form>

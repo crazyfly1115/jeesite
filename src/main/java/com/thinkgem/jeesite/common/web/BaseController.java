@@ -23,6 +23,7 @@ import com.thinkgem.jeesite.modules.gen.entity.GenTable;
 import com.thinkgem.jeesite.modules.gen.entity.GenTableColumn;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authz.UnauthorizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -175,6 +176,9 @@ public abstract class BaseController {
 	        response.setContentType(type);
 	        response.setCharacterEncoding("utf-8");
 			response.getWriter().print(string);
+			if (logger.isDebugEnabled()){
+				logger.debug("输出数据:{}",string);
+			}
 			return null;
 		} catch (IOException e) {
 			return null;
@@ -182,11 +186,13 @@ public abstract class BaseController {
 	}
 
 	/**
-	 * 参数绑定异常
+	 * 参数绑定异常, ConstraintViolationException.class, ValidationException.class
 	 */
-	@ExceptionHandler({BindException.class, ConstraintViolationException.class, ValidationException.class})
+	@ExceptionHandler({BindException.class})
+	@ResponseBody
 	public String bindException() {
-		return "error/400";
+
+		return  new  Ret(1,"参数绑定异常,请使用正规途径访问").toString();
 	}
 	@ExceptionHandler({com.google.gson.JsonSyntaxException.class})
 	@ResponseBody
@@ -230,7 +236,11 @@ public abstract class BaseController {
 		return new Ret(-1,"授权登录异常，请退出后重新登录").toString();
 
     }
-	
+	@ExceptionHandler({UnauthorizedException.class})
+	@ResponseBody
+	public String UnauthorizedException(){
+		return new Ret(1,"无权限操作").toString();
+	}
 	/**
 	 * 初始化数据绑定
 	 * 1. 将所有传递进来的String进行HTML编码，防止XSS攻击

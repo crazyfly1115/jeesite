@@ -74,6 +74,9 @@ public class GenTableController extends BaseController {
 		else{
 			genTable = genTableService.getTableFormDb(genTable);
 		}
+		if (StringUtils.isBlank(genTable.getPackageName())){
+			genTable.setPackageName("com.thinkgem.jeesite.modules");
+		}
 		model.addAttribute("genTable", genTable);
 		model.addAttribute("config", GenUtils.getConfig());
 		return "modules/gen/genTableForm";
@@ -91,8 +94,9 @@ public class GenTableController extends BaseController {
 			genTable.setName("");
 			return form(genTable, model);
 		}
-		genTableService.save(genTable);
-		addMessage(redirectAttributes, "保存业务表'" + genTable.getName() + "'成功");
+		String rs=genTableService.save(genTable);
+		addMessage(redirectAttributes, "保存业务表'" + genTable.getName() + "'成功"+rs);
+
 		return "redirect:" + adminPath + "/gen/genTable/?repage";
 	}
 	

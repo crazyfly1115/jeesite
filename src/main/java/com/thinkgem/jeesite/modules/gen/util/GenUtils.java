@@ -295,31 +295,31 @@ public class GenUtils {
 	 * @param genTable
 	 * @return
 	 */
-	public static Map<String, Object> getDataModel(GenScheme genScheme){
+	public static Map<String, Object> getDataModel(GenTable genTable){
 		Map<String, Object> model = Maps.newHashMap();
 		
-		model.put("packageName", StringUtils.lowerCase(genScheme.getPackageName()));
+		model.put("packageName", StringUtils.lowerCase(genTable.getPackageName()));
 		model.put("lastPackageName", StringUtils.substringAfterLast((String)model.get("packageName"),"."));
-		model.put("moduleName", StringUtils.lowerCase(genScheme.getModuleName()));
-		model.put("subModuleName", StringUtils.lowerCase(genScheme.getSubModuleName()));
-		model.put("className", StringUtils.uncapitalize(genScheme.getGenTable().getClassName()));
-		model.put("ClassName", StringUtils.capitalize(genScheme.getGenTable().getClassName()));
+		model.put("moduleName", StringUtils.lowerCase(genTable.getModuleName()));
+		model.put("subModuleName", StringUtils.lowerCase(genTable.getSubModuleName()));
+		model.put("className", StringUtils.uncapitalize(genTable.getClassName()));
+		model.put("ClassName", StringUtils.capitalize(genTable.getClassName()));
 		
-		model.put("functionName", genScheme.getFunctionName());
-		model.put("functionNameSimple", genScheme.getFunctionNameSimple());
-		model.put("functionAuthor", StringUtils.isNotBlank(genScheme.getFunctionAuthor())?genScheme.getFunctionAuthor():UserUtils.getUser().getName());
+		model.put("functionName", genTable.getFunctionName());
+		model.put("functionNameSimple", genTable.getFunctionNameSimple());
+		model.put("functionAuthor", StringUtils.isNotBlank(genTable.getFunctionAuthor())?genTable.getFunctionAuthor():UserUtils.getUser().getName());
 		model.put("functionVersion", DateUtils.getDate());
 		
-		model.put("urlPrefix", model.get("moduleName")+(StringUtils.isNotBlank(genScheme.getSubModuleName())
-				?"/"+StringUtils.lowerCase(genScheme.getSubModuleName()):"")+"/"+model.get("className"));
+		model.put("urlPrefix", model.get("moduleName")+(StringUtils.isNotBlank(genTable.getSubModuleName())
+				?"/"+StringUtils.lowerCase(genTable.getSubModuleName()):"")+"/"+model.get("className"));
 		model.put("viewPrefix", //StringUtils.substringAfterLast(model.get("packageName"),".")+"/"+
 				model.get("urlPrefix"));
-		model.put("permissionPrefix", model.get("moduleName")+(StringUtils.isNotBlank(genScheme.getSubModuleName())
-				?":"+StringUtils.lowerCase(genScheme.getSubModuleName()):"")+":"+model.get("className"));
+		model.put("permissionPrefix", model.get("moduleName")+(StringUtils.isNotBlank(genTable.getSubModuleName())
+				?":"+StringUtils.lowerCase(genTable.getSubModuleName()):"")+":"+model.get("className"));
 		
 		model.put("dbType", Global.getConfig("jdbc.type"));
 
-		model.put("table", genScheme.getGenTable());
+		model.put("table", genTable);
 		
 		return model;
 	}

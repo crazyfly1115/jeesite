@@ -35,16 +35,23 @@ public class ${ClassName}Controller extends BaseController {
 	@RequiresPermissions("${permissionPrefix}:edit")
 	@RequestMapping(value = "save")
 	@ResponseBody
-	public String save(@RequestBody ${ClassName} ${className}) {
-	
+	public String save(@RequestParam(required = true) String json) {
+
+		 ${ClassName} ${className}=gson.fromJson(json, ${ClassName}.class);
+
 		beanValidator(${className});
+	
+		${className}Service.save(${className});
 
 	    return new Ret(0,MsgSuccess).putMap("data",${className}).toString();
 	}
 	@RequiresPermissions("${permissionPrefix}:delete")
 	@RequestMapping(value = "delete")
 	@ResponseBody
-	public String delete(@RequestParam("ids[]") String[] ids) {
+	public String delete(@RequestParam(required = true) String json) {
+
+		String[] ids=gson.fromJson(json,String[].class);
+
 		if(ids==null||ids.length==0){
 			return new Ret(1, MsgReqNotNull).toString();
 		}
