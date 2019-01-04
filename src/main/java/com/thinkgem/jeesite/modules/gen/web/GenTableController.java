@@ -3,11 +3,14 @@
  */
 package com.thinkgem.jeesite.modules.gen.web;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.sun.tools.javah.Gen;
+import com.thinkgem.jeesite.modules.sys.entity.Dict;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -78,6 +81,15 @@ public class GenTableController extends BaseController {
 			genTable.setPackageName("com.thinkgem.jeesite.modules");
 		}
 		model.addAttribute("genTable", genTable);
+		List<Dict> dictlist= new ArrayList<Dict>();
+		List<GenTable> gtlist=genTableService.findAll();
+		for (GenTable gt:gtlist){
+			Dict d=new Dict();
+			d.setLabel(gt.getClassName());
+			d.setValue(gt.getClassName());
+			dictlist.add(d);
+		}
+		model.addAttribute("classNames",dictlist);
 		model.addAttribute("config", GenUtils.getConfig());
 		return "modules/gen/genTableForm";
 	}

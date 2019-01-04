@@ -187,6 +187,9 @@
 											<c:forEach items="${config.javaTypeList}" var="dict">
 												<option value="${dict.value}" ${dict.value==column.javaType?'selected':''} title="${dict.description}">${dict.label}</option>
 											</c:forEach>
+											<c:forEach items="${classNames}" var="dict">
+												<option value="${dict.value}" ${dict.value==column.javaType?'selected':''} title="${dict.description}">${dict.label}</option>
+											</c:forEach>
 										</select>
 									</td>
 									<td>
@@ -246,13 +249,13 @@
 
 
 									<td>
-										<input type="text" name="columnList[${vs.index}].tableLogicName" value="${column.tableLogicName}" maxlength="200" class=" input-min"/>
+										<input type="text" name="columnList[${vs.index}].tableLogicName" value="${column.tableLogicName}" maxlength="200" class=" input-min" style="width:100px;"/>
 									</td>
 									<td>
-										<input type="text" name="columnList[${vs.index}].tableShowName" value="${column.tableShowName}" maxlength="200" class=" input-min"/>
+										<input type="text" name="columnList[${vs.index}].tableShowName" value="${column.tableShowName}" maxlength="200" class=" input-min" style="width:100px;"/>
 									</td>
 									<td>
-										<input type="text" name="columnList[${vs.index}].tableName" value="${column.tableName}" maxlength="200" class=" input-min"/>
+										<input type="text" name="columnList[${vs.index}].tableName" value="${column.tableName}" maxlength="200" class=" input-min" style="width:100px;"/>
 									</td>
 									<td>
 										<input type="text" name="columnList[${vs.index}].sort" value="${column.sort}" maxlength="200" class="required input-min digits"/>

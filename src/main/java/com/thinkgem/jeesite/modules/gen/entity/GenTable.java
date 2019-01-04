@@ -5,6 +5,7 @@ package com.thinkgem.jeesite.modules.gen.entity;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.validator.constraints.Length;
 
 import com.google.common.collect.Lists;
@@ -281,7 +282,7 @@ public class GenTable extends DataEntity<GenTable> {
 	public void setCategory(String category) {
 		this.category = category;
 	}
-
+	@JsonIgnore
 	public String getFlag() {
 		return flag;
 	}

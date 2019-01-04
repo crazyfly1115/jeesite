@@ -14,9 +14,9 @@ import com.thinkgem.jeesite.modules.ips.entity.Website;
 import com.thinkgem.jeesite.modules.ips.service.WebsiteService;
 
 /**
- * 网站管理Controller
+ * 网站数据Controller
  * @author zhangsy
- * @version 2018-12-29
+ * @version 2019-01-03
  * 尚渝网络
  */
 @Controller

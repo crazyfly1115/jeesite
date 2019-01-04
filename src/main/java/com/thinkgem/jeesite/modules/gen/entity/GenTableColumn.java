@@ -263,6 +263,9 @@ public class GenTableColumn extends DataEntity<GenTableColumn> {
 	public void setTableName(String tableName) {
 		this.tableName = tableName;
 	}
+	public String getTableShowNameField(){
+		return StringUtils.toCamelCase(this.tableShowName);
+	}
 
 	/**
 	 * 获取列名和说明
@@ -379,7 +382,19 @@ public class GenTableColumn extends DataEntity<GenTableColumn> {
 		}
 		return list;
 	}
-	
+	/**
+	 * @Author zhangsy
+	 * @Description  返回显示字段的驼峰
+	 * @Date 11:11 2019/1/3
+	 * @Param []
+	 * @return java.lang.String
+	 * @Company 重庆尚渝网络科技
+	 * @version v1000
+	 **/
+	@JsonIgnore
+	public String getTableShowNameCase(){
+		return StringUtils.toCamelCase(this.tableShowName);
+	}
 	/**
 	 * 是否是基类字段
 	 * @return
