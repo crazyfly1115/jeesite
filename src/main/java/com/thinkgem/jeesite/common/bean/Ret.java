@@ -78,6 +78,10 @@ public class Ret {
     public void putAllMap(Map<String, Object> map){
         this.data.putAll(map);
     }
+    public Ret putData(Object object){
+        this.data.put("data",object);
+        return this;
+    }
     @Override
     public String toString() {
 //		GsonBuilder gsonBuilder = new GsonBuilder();
