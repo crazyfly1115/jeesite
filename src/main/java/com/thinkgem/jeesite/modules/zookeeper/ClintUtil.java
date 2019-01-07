@@ -2,6 +2,8 @@ package com.thinkgem.jeesite.modules.zookeeper;
 
 import com.fcibook.quick.http.QuickHttp;
 
+import java.net.URLDecoder;
+
 public class ClintUtil {
     public static String postClint(String url,String body){
         QuickHttp qk=new QuickHttp().post().url(url).setBodyContent(body).addHeader("Content-Type","application/json");
@@ -23,6 +25,8 @@ public class ClintUtil {
                 "    \"ftp_uname\": \"ftp_uname\",\n" +
                 "    \"ftp_upwd\": \"ftp_upwd\"\n" +
                 "}";
-        System.out.println(postClint("http://47.93.234.168:8443/crawlnode/crawler/service_config",body));
+      //  System.out.println(postClint("http://47.93.234.168:8443/crawlnode/crawler/service_config",body));
+        System.out.println(URLDecoder.decode("http%3A%2F%2F47.93.234.168%3A8443%2Fcrawlnode%2Fcrawler%2Ftask_schedule"));
+
     }
 }

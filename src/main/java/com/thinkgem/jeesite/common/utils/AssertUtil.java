@@ -1,6 +1,9 @@
 package com.thinkgem.jeesite.common.utils;
 
 import org.springframework.util.Assert;
+
+import java.util.List;
+
 /**
  * @Author zhangsy
  * @Description  AssertUtil 继承Assert
@@ -20,19 +23,20 @@ public class AssertUtil  extends Assert {
      * @Company 重庆尚渝网络科技
      * @version v1000
      **/
-    public  void notEmpty(Object o,String errmsg){
+    public static void notEmpty(Object o,String errmsg){
         notNull(o);
         if(o instanceof String){
             if(StringUtils.isBlank(o.toString()))
                 throw new IllegalArgumentException(errmsg);
         }
+        if(o instanceof List){
+            if(((List) o).size()==0){
+                throw new IllegalArgumentException(errmsg);
+            }
+        }
     }
-    public  void notEmpty(Object o){
+    public static void notEmpty(Object o){
         String errmsg="该参数不能为空";
         notNull(o,errmsg);
-        if(o instanceof String){
-            if(StringUtils.isBlank(o.toString()))
-                throw new IllegalArgumentException(errmsg);
-        }
     }
 }

@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.ips.dao.ReptileTaskDao">
+    
+	<sql id="reptileTaskColumns">
+				a.id AS "id",
+				a.task_name AS "taskName",
+				a.task_begin AS "taskBegin",
+				a.task_end AS "taskEnd",
+				a.task_state AS "taskState",
+				a.start_mode AS "startMode",
+				a.task_cron AS "taskCron",
+				a.retry_times AS "retryTimes",
+				a.url_layers AS "urlLayers",
+				a.task_python AS "taskPython",
+				a.task_parse AS "taskParse",
+				a.collect_data_id AS "collectDataId.id",
+				a.create_by AS "createBy.id",
+				a.create_date AS "createDate",
+				a.update_by AS "updateBy.id",
+				a.update_date AS "updateDate",
+				a.remarks AS "remarks",
+				a.del_flag AS "delFlag",
+				w12.poi_type AS "collectDataId.poiType"
+	</sql>
+	
+	<sql id="reptileTaskJoins">
+	   LEFT JOIN tb_collect_data w12 ON w12.id= a.collect_data_id
+	</sql>
+    
+	<select id="get" resultType="ReptileTask">
+		SELECT 
+			<include refid="reptileTaskColumns"/>
+		FROM tb_task a
+		<include refid="reptileTaskJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ReptileTask">
+		SELECT 
+			<include refid="reptileTaskColumns"/>
+		FROM tb_task a
+		<include refid="reptileTaskJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="taskState != null and taskState != ''">
+				AND a.task_state = #{taskState}
+			</if>
+			<if test="startMode != null and startMode != ''">
+				AND a.start_mode = #{startMode}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ReptileTask">
+		SELECT 
+			<include refid="reptileTaskColumns"/>
+		FROM tb_task a
+		<include refid="reptileTaskJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO tb_task(
+			id,
+			task_name,
+			task_begin,
+			task_end,
+			task_state,
+			start_mode,
+			task_cron,
+			retry_times,
+			url_layers,
+			task_python,
+			task_parse,
+			collect_data_id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{taskName},
+			#{taskBegin},
+			#{taskEnd},
+			#{taskState},
+			#{startMode},
+			#{taskCron},
+			#{retryTimes},
+			#{urlLayers},
+			#{taskPython},
+			#{taskParse},
+			#{collectDataId.id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE tb_task SET 	
+			task_name = #{taskName},
+			task_begin = #{taskBegin},
+			task_end = #{taskEnd},
+			task_state = #{taskState},
+			start_mode = #{startMode},
+			task_cron = #{taskCron},
+			retry_times = #{retryTimes},
+			url_layers = #{urlLayers},
+			task_python = #{taskPython},
+			task_parse = #{taskParse},
+			collect_data_id = #{collectDataId.id},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			del_flag = #{delFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="deleteById">
+		UPDATE tb_task SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

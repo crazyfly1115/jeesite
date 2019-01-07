@@ -36,6 +36,12 @@
 		<category value="treeTableAndList" label="树结构表（左树右表）">
 			<template>category-ref:dao</template>
 		</category>
+		<category value="mapper" label="mapper">
+			<template>dao/mapper.xml</template>
+		</category>
+		<category value="bean" label="bean">
+			<template>dao/entity.xml</template>
+		</category>
 	</category>
 	<!-- java类型 -->
 	<javaType>

@@ -1,11 +1,16 @@
 package com.thinkgem.jeesite.modules.zookeeper;
 
 
+import com.thinkgem.jeesite.common.config.Global;
+import com.thinkgem.jeesite.common.utils.AssertUtil;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.Stat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,9 +18,9 @@ import java.util.List;
 
 public class ZookeeperSession  implements Watcher {
     private static ZooKeeper zooKeeper;
-    private static final String rootPath="/crawler";
-    private static final String ZookeeperAdder="113.204.4.244:5573";
-
+    public static final String rootPath=Global.getConfig("zookeeperRootPath");
+    public static final String ZookeeperAdder=Global.getConfig("ZookeeperAdder");
+    protected Logger logger = LoggerFactory.getLogger(getClass());
     @Override
     public void process(WatchedEvent watchedEvent) {
         System.out.println(watchedEvent.getState());
@@ -28,7 +33,11 @@ public class ZookeeperSession  implements Watcher {
         }
         System.out.println("接收内容："+watchedEvent.toString());
     }
-
+    public static ZooKeeper getZooKeeper() throws IOException {
+        AssertUtil.notNull(ZookeeperAdder);
+        zooKeeper = new ZooKeeper(ZookeeperAdder,5000, new ZookeeperSession());
+        return zooKeeper;
+    }
     public static void main(String[] args) throws KeeperException {
         try {
             zooKeeper = new ZooKeeper(ZookeeperAdder,5000, new ZookeeperSession());

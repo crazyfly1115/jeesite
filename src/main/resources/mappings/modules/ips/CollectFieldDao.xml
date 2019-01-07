@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.ips.dao.CollectFieldDao">
+    
+	<sql id="collectFieldColumns">
+				a.id AS "id",
+				a.collect_table_id AS "collectTableId.id",
+				a.field_code AS "fieldCode",
+				a.field_name AS "fieldName",
+				a.field_length AS "fieldLength",
+				a.is_update AS "isUpdate",
+				a.slave_collect_table_id AS "slaveCollectTableId",
+				a.create_by AS "createBy.id",
+				a.create_date AS "createDate",
+				a.update_by AS "updateBy.id",
+				a.update_date AS "updateDate",
+				a.remarks AS "remarks",
+				a.del_flag AS "delFlag",
+				w2.table_name AS "collectTableId.tableName"
+	</sql>
+	
+	<sql id="collectFieldJoins">
+	   LEFT JOIN tb_collect_table w2 ON w2.id= a.collect_table_id
+	</sql>
+    
+	<select id="get" resultType="CollectField">
+		SELECT 
+			<include refid="collectFieldColumns"/>
+		FROM tb_collect_field a
+		<include refid="collectFieldJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CollectField">
+		SELECT 
+			<include refid="collectFieldColumns"/>
+		FROM tb_collect_field a
+		<include refid="collectFieldJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="collectTableId != null and collectTableId.id != null and collectTableId.id != ''">
+				AND a.collect_table_id =#{collectTableId.id}
+					<!--<if test="dbName == 'oracle'">'%'||#{collectTableId.id}||'%'</if>-->
+					<!--<if test="dbName == 'mssql'">'%'+#{collectTableId.id}+'%'</if>-->
+					<!--<if test="dbName == 'mysql'">concat('%',,'%')</if>-->
+			</if>
+			<if test="fieldCode != null and fieldCode != ''">
+				AND a.field_code LIKE 
+					<if test="dbName == 'oracle'">'%'||#{fieldCode}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{fieldCode}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{fieldCode},'%')</if>
+			</if>
+			<if test="fieldName != null and fieldName != ''">
+				AND a.field_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{fieldName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{fieldName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{fieldName},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CollectField">
+		SELECT 
+			<include refid="collectFieldColumns"/>
+		FROM tb_collect_field a
+		<include refid="collectFieldJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO tb_collect_field(
+			id,
+			collect_table_id,
+			field_code,
+			field_name,
+			field_length,
+			is_update,
+			slave_collect_table_id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{collectTableId.id},
+			#{fieldCode},
+			#{fieldName},
+			#{fieldLength},
+			#{isUpdate},
+			#{slaveCollectTableId},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE tb_collect_field SET 	
+			collect_table_id = #{collectTableId.id},
+			field_code = #{fieldCode},
+			field_name = #{fieldName},
+			field_length = #{fieldLength},
+			is_update = #{isUpdate},
+			slave_collect_table_id = #{slaveCollectTableId},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			del_flag=#{delFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="deleteById">
+		UPDATE tb_collect_field SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<update id="deleteByTableId">
+		UPDATE tb_collect_field SET
+			del_flag = '1'
+		WHERE  collect_table_id= #{tableId}
+	</update>
+</mapper>

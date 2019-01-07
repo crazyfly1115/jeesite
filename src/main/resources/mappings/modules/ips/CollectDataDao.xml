@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.ips.dao.CollectDataDao">
+    
+	<sql id="collectDataColumns">
+				a.id AS "id",
+				a.website_id AS "websiteId.id",
+				a.collect_type_id AS "collectTypeId",
+				a.collect_table_id AS "collectTableId.id",
+				a.is_format AS "isFormat",
+				a.ftp_url AS "ftpUrl",
+				a.ftp_user AS "ftpUser",
+				a.ftp_psw AS "ftpPsw",
+				a.ftp_port AS "ftpPort",
+				a.ftp_dir AS "ftpDir",
+				a.poi_type AS "poiType",
+				a.create_by AS "createBy.id",
+				a.create_date AS "createDate",
+				a.update_by AS "updateBy.id",
+				a.update_date AS "updateDate",
+				a.remarks AS "remarks",
+				a.del_flag AS "delFlag",
+				w2.website_name AS "websiteId.websiteName",
+				w4.table_name AS "collectTableId.tableName"
+	</sql>
+	
+	<sql id="collectDataJoins">
+	   LEFT JOIN tb_website w2 ON w2.id= a.website_id
+	   LEFT JOIN tb_collect_table w4 ON w4.id= a.collect_table_id
+	</sql>
+    
+	<select id="get" resultType="CollectData">
+		SELECT 
+			<include refid="collectDataColumns"/>
+		FROM tb_collect_data a
+		<include refid="collectDataJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CollectData">
+		SELECT 
+			<include refid="collectDataColumns"/>
+		FROM tb_collect_data a
+		<include refid="collectDataJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CollectData">
+		SELECT 
+			<include refid="collectDataColumns"/>
+		FROM tb_collect_data a
+		<include refid="collectDataJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO tb_collect_data(
+			id,
+			website_id,
+			collect_type_id,
+			collect_table_id,
+			is_format,
+			ftp_url,
+			ftp_user,
+			ftp_psw,
+			ftp_port,
+			ftp_dir,
+			poi_type,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{websiteId.id},
+			#{collectTypeId},
+			#{collectTableId.id},
+			#{isFormat},
+			#{ftpUrl},
+			#{ftpUser},
+			#{ftpPsw},
+			#{ftpPort},
+			#{ftpDir},
+			#{poiType},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE tb_collect_data SET 	
+			website_id = #{websiteId.id},
+			collect_type_id = #{collectTypeId},
+			collect_table_id = #{collectTableId.id},
+			is_format = #{isFormat},
+			ftp_url = #{ftpUrl},
+			ftp_user = #{ftpUser},
+			ftp_psw = #{ftpPsw},
+			ftp_port = #{ftpPort},
+			ftp_dir = #{ftpDir},
+			poi_type = #{poiType},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="deleteById">
+		UPDATE tb_collect_data SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

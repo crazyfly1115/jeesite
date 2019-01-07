@@ -5,11 +5,14 @@ package com.thinkgem.jeesite.modules.sys.interceptor;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
+import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.gson.Gson;
 import com.thinkgem.jeesite.common.utils.StringUtils;
+import net.sf.ehcache.transaction.xa.commands.StorePutCommand;
 import org.springframework.core.NamedThreadLocal;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -45,7 +48,9 @@ public class LogInterceptor extends BaseService implements HandlerInterceptor {
 			while ((inputStr = streamReader.readLine ()) != null)
 				responseStrBuilder.append (inputStr);
 			String parmeter = responseStrBuilder.toString();
-			logger.debug("请求参数:{},请求URI:{}",parmeter,request.getRequestURI());
+
+
+			logger.debug("请求参数:{},请求URI:{}",new Gson().toJson(request.getParameterMap()),request.getRequestURI());
 		}
 		return true;
 	}
