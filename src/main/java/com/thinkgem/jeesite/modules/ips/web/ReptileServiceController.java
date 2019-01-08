@@ -92,10 +92,10 @@ public class ReptileServiceController extends BaseController {
 	@RequiresPermissions("ips:reptileService:view")
 	@RequestMapping(value = {"updateServer"})
 	@ResponseBody
-	public String updateServer() {
+	public String updateServer(@RequestParam(required = true) String id) {
 
 
-		reptileServiceService.getServerByZookeaper("1","1","1");
+		reptileServiceService.serviceConfig(reptileServiceService.get(id));
 
 		return new Ret().toString();
 	}

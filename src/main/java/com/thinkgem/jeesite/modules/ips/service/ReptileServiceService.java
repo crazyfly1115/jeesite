@@ -5,6 +5,7 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gson.Gson;
 import com.thinkgem.jeesite.common.utils.AssertUtil;
 import com.thinkgem.jeesite.modules.zookeeper.ClintUtil;
 import com.thinkgem.jeesite.modules.zookeeper.ZookeeperSession;
@@ -37,7 +38,7 @@ public class ReptileServiceService extends CrudService<ReptileServiceDao, Reptil
      * @Company 重庆尚渝网络科技
      * @version v1000
      **/
-    public List<ReptileService> getServerByZookeaper(String server,String action,String data){
+    public List<ReptileService> updateServerByZookeaper(String server,String action,String data){
 
         try {
 
@@ -77,4 +78,11 @@ public class ReptileServiceService extends CrudService<ReptileServiceDao, Reptil
         }
         return null;
     }
+
+    //更新配置信息
+
+   public void serviceConfig(ReptileService reptileService){
+
+       updateServerByZookeaper(reptileService.getServiceIp(),"service_config",new Gson().toJson(reptileService));
+   }
 }

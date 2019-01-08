@@ -196,4 +196,7 @@ public class Global {
 		return projectPath;
 	}
 
+    public static String getUserfilesWebUrl() {
+		return getConfig("userfile.weburl");//
+    }
 }

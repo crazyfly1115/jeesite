@@ -25,6 +25,9 @@ import com.thinkgem.jeesite.modules.ips.dao.ReptileTaskDao;
 public class ReptileTaskService extends CrudService<ReptileTaskDao, ReptileTask> {
     @Autowired
     private ServiceTaskService serviceTaskService;
+
+    @Autowired
+    private ReptileServiceService reptileService;
     @Override
     @Transactional
     public void save(ReptileTask entity) {
@@ -36,5 +39,10 @@ public class ReptileTaskService extends CrudService<ReptileTaskDao, ReptileTask>
             sc.setServiceId(rs.getId());
             serviceTaskService.save(sc);
         }
+    }
+    public void taskAdd(ReptileTask reptileTask){
+
+        reptileService.updateServerByZookeaper(null,null,null);
+
     }
 }
