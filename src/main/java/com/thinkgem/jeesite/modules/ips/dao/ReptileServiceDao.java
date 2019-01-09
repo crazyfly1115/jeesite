@@ -12,5 +12,7 @@ import com.thinkgem.jeesite.modules.ips.entity.ReptileService;
  */
 @MyBatisDao
 public interface ReptileServiceDao extends CrudDao<ReptileService> {
-	
+
+
+
 }

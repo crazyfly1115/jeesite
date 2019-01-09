@@ -8,6 +8,7 @@ import com.thinkgem.jeesite.common.utils.AssertUtil;
 import com.thinkgem.jeesite.common.utils.Vuetree.VueTreeDTO;
 import com.thinkgem.jeesite.modules.gen.entity.GenTable;
 import com.thinkgem.jeesite.modules.gen.entity.GenTableColumn;
+import com.thinkgem.jeesite.modules.ips.entity.CollectField;
 import com.thinkgem.jeesite.modules.ips.entity.CollectTable;
 import com.thinkgem.jeesite.modules.ips.service.CollectTableService;
 import com.thinkgem.jeesite.modules.ips.service.DuridService;
@@ -170,10 +171,11 @@ public class DatabaseController extends BaseController {
 		AssertUtil.notNull(database,"数据库中未查询到该数据库");
 		List list=new ArrayList();
 		for(GenTableColumn g:duridService.getColumnByTable(database,tableName)){
-			VueTreeDTO v=new VueTreeDTO();
-			v.setId(g.getName());
-			v.setLabel(g.getNameAndComments());
-			list.add(v);
+			CollectField c=new CollectField();
+			c.setFieldCode(g.getName());
+			c.setFieldName(g.getComments());
+			c.setFieldLength(g.getDataLength());
+			list.add(c);
 		}
 		return new Ret().putMap("data",list).toString();
 

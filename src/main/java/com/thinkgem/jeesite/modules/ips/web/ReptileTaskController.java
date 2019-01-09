@@ -93,11 +93,24 @@ public class ReptileTaskController extends BaseController {
 	 * @Company 重庆尚渝网络科技
 	 * @version v1000
 	 **/
+	@RequiresPermissions("ips:reptileTask:view")
+	@RequestMapping(value = {"updateTask"})
+	@ResponseBody
 	public String updateTask(@RequestParam(required = true)String id){
 		ReptileTask reptileTask=reptileTaskService.get(id);
-		AssertUtil.isNull(reptileTask,"未查询到相关数据");
+		AssertUtil.notNull(reptileTask,"未查询到相关数据");
 		//TO-DO 操作zookeeper的相关数据
-
-		return new Ret().toString();
+		reptileTaskService.taskAdd(reptileTask);
+		return new Ret(0,"更新成功").toString();
+	}
+	@RequiresPermissions("ips:reptileTask:view")
+	@RequestMapping(value = {"changeState"})
+	@ResponseBody
+	public String changeState(@RequestParam(required = true)String id,@RequestParam(required = true)String state){
+		ReptileTask reptileTask=reptileTaskService.get(id);
+		AssertUtil.notNull(reptileTask,"未查询到相关数据");
+		//TO-DO 操作zookeeper的相关数据
+		reptileTaskService.changeState(reptileTask,Integer.parseInt(state));
+		return new Ret(0,"更新成功").toString();
 	}
 }

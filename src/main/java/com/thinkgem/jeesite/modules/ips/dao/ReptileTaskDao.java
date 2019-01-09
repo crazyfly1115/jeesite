@@ -3,6 +3,11 @@ package com.thinkgem.jeesite.modules.ips.dao;
 import com.thinkgem.jeesite.common.persistence.CrudDao;
 import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
 import com.thinkgem.jeesite.modules.ips.entity.ReptileTask;
+import com.thinkgem.jeesite.modules.ips.entity.RootTask;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * 爬虫任务DAO接口
@@ -12,5 +17,5 @@ import com.thinkgem.jeesite.modules.ips.entity.ReptileTask;
  */
 @MyBatisDao
 public interface ReptileTaskDao extends CrudDao<ReptileTask> {
-	
+    List<Map> getTask(@Param("id")String id);
 }

@@ -2,6 +2,7 @@ package com.thinkgem.jeesite.modules.ips.service;
 
 import java.util.List;
 
+import com.thinkgem.jeesite.modules.ips.entity.CollectTable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,5 +23,13 @@ public class CollectFieldService extends CrudService<CollectFieldDao, CollectFie
 
     public void deleteByTableId(String id) {
         dao.deleteByTableId(id);
+    }
+
+    public List<CollectField> findListByTableId(String table_id) {
+        CollectTable c=new CollectTable();
+        c.setId(table_id);
+        CollectField cf=new CollectField();
+        cf.setCollectTableId(c);
+        return findList(cf);
     }
 }

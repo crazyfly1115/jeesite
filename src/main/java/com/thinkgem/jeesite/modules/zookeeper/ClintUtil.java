@@ -6,7 +6,7 @@ import java.net.URLDecoder;
 
 public class ClintUtil {
     public static String postClint(String url,String body){
-        QuickHttp qk=new QuickHttp().post().url(url).setBodyContent(body).addHeader("Content-Type","application/json");
+        QuickHttp qk=new QuickHttp().post().url(url).setBodyContent(body).addHeader("Content-Type","application/json;charset=utf-8");
         return qk.text();
     }
 

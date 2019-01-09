@@ -99,4 +99,10 @@ public class ReptileServiceController extends BaseController {
 
 		return new Ret().toString();
 	}
+	@RequiresPermissions("ips:reptileService:view")
+	@RequestMapping(value = {"getServer"})
+	@ResponseBody
+	public String getServer() {
+		return new Ret().putData(reptileServiceService.getServer()).toString();
+	}
 }

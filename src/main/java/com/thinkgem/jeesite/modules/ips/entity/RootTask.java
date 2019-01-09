@@ -1,4 +1,6 @@
-package com.thinkgem.jeesite.modules.zookeeper;
+package com.thinkgem.jeesite.modules.ips.entity;
+import com.thinkgem.jeesite.common.persistence.DataEntity;
+
 import java.util.Date;
 import java.util.List;
 
@@ -8,8 +10,10 @@ import java.util.List;
  * @author bejson.com (i@bejson.com)
  * @website http://www.bejson.com/java2pojo/
  */
-public class RootTask {
+public class RootTask extends DataEntity<RootTask> {
 
+    private static final long serialVersionUID = 1L;
+    private String task_id;
     private String task_name;
     private String task_url;
     private String task_file;
@@ -22,6 +26,7 @@ public class RootTask {
     private Date task_start_time;
     private int retry_times;
     private String ftp_dir;
+    private String service_name;
     public void setTask_name(String task_name) {
         this.task_name = task_name;
     }
@@ -106,4 +111,23 @@ public class RootTask {
         return ftp_dir;
     }
 
+    public String getService_name() {
+        return service_name;
+    }
+
+    public void setService_name(String service_name) {
+        this.service_name = service_name;
+    }
+
+    public String getTask_id() {
+        return task_id;
+    }
+
+    public void setTask_id(String task_id) {
+        this.task_id = task_id;
+    }
+
+    public boolean isTask_status() {
+        return task_status;
+    }
 }

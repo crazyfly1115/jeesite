@@ -251,7 +251,7 @@ LoginController extends BaseController{
 
 		Ret ret=new Ret();
 		ret.putMap("user",UserUtils.getUser());
-		ret.putMap("menuList",UserUtils.getMenuListTree());
+		ret.putMap("menuList",UserUtils.getMenuList());
 		return ret.toString();
 //		// 如果已登录，再次访问主页，则退出原账号。
 //		if (Global.TRUE.equals(Global.getConfig("notAllowRefreshIndex"))){

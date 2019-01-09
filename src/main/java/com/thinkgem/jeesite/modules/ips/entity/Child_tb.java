@@ -1,8 +1,4 @@
-package com.thinkgem.jeesite.modules.zookeeper;
-/**
- * Copyright 2019 bejson.com
- */
-import java.util.List;
+package com.thinkgem.jeesite.modules.ips.entity;
 
 /**
  * Auto-generated: 2019-01-07 19:54:40
@@ -10,13 +6,28 @@ import java.util.List;
  * @author bejson.com (i@bejson.com)
  * @website http://www.bejson.com/java2pojo/
  */
-public class Task_bind_db {
+public class Child_tb {
 
+    private String field_name;
+    private String child_tb_name;
     private String db_url;
     private String db_username;
     private String db_password;
     private String tb_name;
-    private List<Child_tb> child_tb;
+    public void setField_name(String field_name) {
+        this.field_name = field_name;
+    }
+    public String getField_name() {
+        return field_name;
+    }
+
+    public void setChild_tb_name(String child_tb_name) {
+        this.child_tb_name = child_tb_name;
+    }
+    public String getChild_tb_name() {
+        return child_tb_name;
+    }
+
 //    public void setDb_ip(String db_ip) {
 //        this.db_ip = db_ip;
 //    }
@@ -38,14 +49,6 @@ public class Task_bind_db {
 //        return db_name;
 //    }
 
-    public String getDb_url() {
-        return db_url;
-    }
-
-    public void setDb_url(String db_url) {
-        this.db_url = db_url;
-    }
-
     public void setDb_username(String db_username) {
         this.db_username = db_username;
     }
@@ -66,13 +69,5 @@ public class Task_bind_db {
     public String getTb_name() {
         return tb_name;
     }
-
-    public void setChild_tb(List<Child_tb> child_tb) {
-        this.child_tb = child_tb;
-    }
-    public List<Child_tb> getChild_tb() {
-        return child_tb;
-    }
-
 
 }
