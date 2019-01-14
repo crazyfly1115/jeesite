@@ -3,11 +3,14 @@ package com.thinkgem.jeesite.modules.ips.web;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.gson.reflect.TypeToken;
 import com.thinkgem.jeesite.common.bean.Ret;
 import com.thinkgem.jeesite.common.utils.AssertUtil;
 import com.thinkgem.jeesite.common.utils.Vuetree.VueTreeDTO;
 import com.thinkgem.jeesite.modules.gen.entity.GenTable;
 import com.thinkgem.jeesite.modules.gen.entity.GenTableColumn;
+import com.thinkgem.jeesite.modules.gen.entity.SerachBean;
+import com.thinkgem.jeesite.modules.gen.entity.SerachColumn;
 import com.thinkgem.jeesite.modules.ips.entity.CollectField;
 import com.thinkgem.jeesite.modules.ips.entity.CollectTable;
 import com.thinkgem.jeesite.modules.ips.service.CollectTableService;
@@ -23,6 +26,7 @@ import com.thinkgem.jeesite.modules.ips.service.DatabaseService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 数据库Controller
@@ -178,6 +182,19 @@ public class DatabaseController extends BaseController {
 			list.add(c);
 		}
 		return new Ret().putMap("data",list).toString();
+
+	}
+
+	@RequiresPermissions("ips:database:view")
+	@RequestMapping(value = {"getTableData"})
+	@ResponseBody
+	public  String getTableData(@RequestParam(required = true) String id,@RequestParam(required = true) String tableName, String json,HttpServletRequest request, HttpServletResponse response){
+
+		Database database=databaseService.get(id);
+		AssertUtil.notNull(database,"数据库中未查询到该数据库");
+		List<SerachColumn> sclist=gson.fromJson(json,new TypeToken<List<SerachColumn>>(){}.getType());
+		SerachBean serachBean=new SerachBean(tableName,sclist);
+		return new Ret().putMap("data",duridService.getTableData(database,serachBean,new Page<Map>(request, response))).toString();
 
 	}
 }

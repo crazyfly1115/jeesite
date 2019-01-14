@@ -2,7 +2,9 @@ package com.thinkgem.jeesite.modules.ips.service;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.pool.DruidDataSourceFactory;
+import com.google.common.base.Objects;
 import com.thinkgem.jeesite.common.persistence.BaseEntity;
+import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.persistence.interceptor.SQLHelper;
 import com.thinkgem.jeesite.common.utils.AssertUtil;
 import com.thinkgem.jeesite.common.utils.Reflections;
@@ -11,6 +13,7 @@ import com.thinkgem.jeesite.modules.gen.dao.GenDataBaseDictDao;
 import com.thinkgem.jeesite.modules.gen.dao.GenTableDao;
 import com.thinkgem.jeesite.modules.gen.entity.GenTable;
 import com.thinkgem.jeesite.modules.gen.entity.GenTableColumn;
+import com.thinkgem.jeesite.modules.gen.entity.SerachBean;
 import com.thinkgem.jeesite.modules.ips.entity.Database;
 import com.thinkgem.jeesite.modules.sys.entity.Log;
 import org.apache.ibatis.session.SqlSession;
@@ -25,8 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import javax.sql.DataSource;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * 爬虫服务任务管关联Service
@@ -59,6 +61,16 @@ public class DuridService{
         sqlSession.close();
         return list;
     }
+
+    //查询数据表数据
+    public  Page getTableData(Database database, SerachBean serachBean, Page page){
+        SqlSession sqlSession=getSqlSessionFactory(database).openSession();
+        serachBean.setPage(page);
+        List<Map> list=sqlSession.getMapper(GenDataBaseDictDao.class).findTableData(serachBean);
+        page.setList(list);
+        sqlSession.close();
+        return page;
+    }
     /*
      * @Author zhangsy
      * @Description  DuridService
@@ -68,7 +80,19 @@ public class DuridService{
      * @Company 重庆尚渝网络科技
      * @version v1000
      **/
+
+
+    private static final Map<String, SqlSessionFactory> SQLSESSIONFACTORYS = new HashMap();
     public SqlSessionFactory getSqlSessionFactory(Database database){
+        SqlSessionFactory sqlSessionFactory= SQLSESSIONFACTORYS.get(database.getId());
+
+        if(sqlSessionFactory!=null){
+            //缓存中存在
+            log.debug("获取到缓存中的数据库:"+database.getId());
+            return  sqlSessionFactory;
+        }
+
+
         Properties properties=new Properties();
 
         AssertUtil.notNull(database.getDatabaseUrl(),"数据库连接不能为空");
@@ -84,6 +108,7 @@ public class DuridService{
         properties.setProperty("maxActive","1");
         DataSource dataSource= null;
         try {
+
             dataSource = DruidDataSourceFactory.createDataSource(properties);
         } catch (Exception e) {
             e.printStackTrace();
@@ -100,13 +125,13 @@ public class DuridService{
 
         Resource conf = new ClassPathResource("mybatis-config.xml");
         sqlSessionFactoryBean.setConfigLocation(conf);
-        SqlSessionFactory sqlSessionFactory= null;
         try {
             sqlSessionFactory = sqlSessionFactoryBean.getObject();
         } catch (Exception e) {
             e.printStackTrace();
             throw  new RuntimeException("创建连接失败,请检查URL,USERNAME,PASSWD");
         }
+        SQLSESSIONFACTORYS.put(database.getId(),sqlSessionFactory);
         return  sqlSessionFactory;
     }
 }

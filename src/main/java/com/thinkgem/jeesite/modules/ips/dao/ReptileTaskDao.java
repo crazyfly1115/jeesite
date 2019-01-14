@@ -18,4 +18,5 @@ import java.util.Map;
 @MyBatisDao
 public interface ReptileTaskDao extends CrudDao<ReptileTask> {
     List<Map> getTask(@Param("id")String id);
+    List<String> getKeyWords();
 }

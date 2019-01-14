@@ -15,7 +15,7 @@
 		<property name="dataSource" ref="dataSource" />
 		<property name="transactionManager" ref="transactionManager" />
 		<property name="deploymentResources" value="classpath*:/act/deployments/**/*.bar"/><!-- 自动部署 -->
-		<property name="databaseSchemaUpdate" value="true" /><!-- 自动建表，自动更新表结构 -->
+		<property name="databaseSchemaUpdate" value="truels" /><!-- 自动建表，自动更新表结构 -->
 		<property name="jobExecutorActivate" value="true" /><!-- 该参数将启用定时相关的功能 -->
 		<property name="history" value="full" /><!-- 历史记录保存模式 -->
 
@@ -40,7 +40,7 @@
 	<bean id="processEngineFactory" class="org.activiti.spring.ProcessEngineFactoryBean">
 		<property name="processEngineConfiguration" ref="processEngineConfiguration" />
 	</bean>
-	
+
 	<bean id="processEngine" factory-bean="processEngineFactory" factory-method="getObject" />
 	<bean id="repositoryService" factory-bean="processEngineFactory" factory-method="getRepositoryService" />
 	<bean id="runtimeService" factory-bean="processEngineFactory" factory-method="getRuntimeService" />

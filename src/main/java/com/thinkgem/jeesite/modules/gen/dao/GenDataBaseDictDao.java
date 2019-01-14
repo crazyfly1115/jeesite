@@ -4,11 +4,13 @@
 package com.thinkgem.jeesite.modules.gen.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import com.thinkgem.jeesite.common.persistence.CrudDao;
 import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
 import com.thinkgem.jeesite.modules.gen.entity.GenTable;
 import com.thinkgem.jeesite.modules.gen.entity.GenTableColumn;
+import com.thinkgem.jeesite.modules.gen.entity.SerachBean;
 
 /**
  * 业务表字段DAO接口
@@ -38,5 +40,6 @@ public interface GenDataBaseDictDao extends CrudDao<GenTableColumn> {
 	 * @return
 	 */
 	List<String> findTablePK(GenTable genTable);
-	
+	//查询数据
+	List<Map> findTableData(SerachBean serachBean);
 }

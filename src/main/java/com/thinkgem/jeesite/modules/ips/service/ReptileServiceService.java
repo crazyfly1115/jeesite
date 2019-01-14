@@ -64,15 +64,14 @@ public class ReptileServiceService extends CrudService<ReptileServiceDao, Reptil
              logger.debug("zook获取的path {}",listPath);
 //             }
              AssertUtil.notEmpty(partntRoot);
-             AssertUtil.notEmpty(URLPath,"zookeeper没有找到子节点");
+             AssertUtil.notEmpty(URLPath,"zookeeper没有找到子节点,该服务不可用");
 
-             logger.debug("zookeeper操作路径{}",partntRoot+URLPath);
-            System.out.println(Encoding.getEncoding(data));
-             zooKeeper.setData(partntRoot+"/"+URLPath,data.getBytes(),-1);
+//             logger.debug("zookeeper操作路径{}",partntRoot+URLPath);
+//             zooKeeper.setData(partntRoot+"/"+URLPath,data.getBytes(),-1);
              String res=ClintUtil.postClint(URLDecoder.decode(URLPath),data);
              PyRes pyRes=new Gson().fromJson(res,PyRes.class);
              logger.debug("请求路径:{}请求内容:{}",URLDecoder.decode(URLPath),data);
-             logger.debug("服务器响应:{}/n 请求内容,{}",res,data);
+             logger.debug("服务器响应:{}/n ,编码{}",res,Encoding.getEncoding(res));
              if(false==pyRes.getSuccess())throw new RuntimeException("通知应用服务器失败,服务器响应"+res);
         } catch (IOException e) {
             e.printStackTrace();

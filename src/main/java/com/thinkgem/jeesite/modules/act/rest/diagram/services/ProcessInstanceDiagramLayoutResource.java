@@ -22,12 +22,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @RestController
-public class ProcessInstanceDiagramLayoutResource extends BaseProcessDefinitionDiagramLayoutResource {
+public class ProcessInstanceDiagramLayoutResource {//extends BaseProcessDefinitionDiagramLayoutResource {
 
 	@RequiresUser
 	@RequestMapping(value = "/act/service/process-instance/{processInstanceId}/diagram-layout", method = RequestMethod.GET, produces = "application/json")
 	public ObjectNode getDiagram(@PathVariable String processInstanceId) {
-		return getDiagramNode(processInstanceId, null);
+//		return getDiagramNode(processInstanceId, null);
+		return null;
 	}
 	
 }

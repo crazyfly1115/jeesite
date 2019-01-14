@@ -47,6 +47,7 @@ public class ReptileTaskService extends CrudService<ReptileTaskDao, ReptileTask>
     public void taskAdd(ReptileTask reptileTask){
 
         List<Map> list=dao.getTask(reptileTask.getId());
+        if(list==null||list.size()==0) throw new RuntimeException("该任务指定爬虫服务");
         for (Map map:list){
 
           List<CollectField> collectFieldList= collectFieldService.findListByTableId(map.get("table_id").toString());
@@ -65,6 +66,7 @@ public class ReptileTaskService extends CrudService<ReptileTaskDao, ReptileTask>
             map.put("task_bind_db",db);
             map.put("task_topic","TaskTopic");
             map.put("task_tag","TaskTag");
+            map.put("poi_kword",dao.getKeyWords());
             reptileService.updateServerByZookeaper((String)map.get("service_name"),"task_add",new JsonMapper(JsonInclude.Include.ALWAYS).toJson(map));
 
 //        String a="{\n" +

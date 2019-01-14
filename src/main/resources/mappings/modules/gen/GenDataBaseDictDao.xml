@@ -110,5 +110,17 @@
 			AND au.COLUMN_KEY='PRI' AND au.TABLE_NAME = (#{name})
 		</if>
 	</select>
+	<select id="findTableData" resultType="java.util.Map" parameterType="com.thinkgem.jeesite.modules.gen.entity.SerachBean">
+
+			select * from ${tableName}
+			<where>
+				1=1
+				<if test="col != null ">
+					<foreach item="item" index="index" collection="col">
+						and  ${item.colName} ${item.searchType} #{item.colValue}
+					</foreach>
+				</if>
+			</where>
+	</select>
 	
 </mapper>
