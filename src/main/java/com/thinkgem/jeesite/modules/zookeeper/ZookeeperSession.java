@@ -23,19 +23,46 @@ public class ZookeeperSession  implements Watcher {
     protected Logger logger = LoggerFactory.getLogger(getClass());
     @Override
     public void process(WatchedEvent watchedEvent) {
-        System.out.println(watchedEvent.getState());
         if(watchedEvent.getState().equals(Event.KeeperState.SyncConnected)) {
             System.out.println("doit");
-
-
-
-
+            logger.debug("已经链接上zookeeper,等待执行操作!");
         }
-        System.out.println("接收内容："+watchedEvent.toString());
+        try {
+            List<String> list_crawlr=zooKeeper.getChildren("/crawler",true);
+            for (String p:list_crawlr){
+                String p1="/crawler/"+p+"/restapi";
+                List<String> list_rest_api=zooKeeper.getChildren(p1,true);
+                if(list_rest_api==null||list_rest_api.size()==0){
+                    logger.debug("{},该节点已经是失去链接",p1);
+                }
+                for (String api:list_rest_api){
+                    String p2=p1+"/"+api;
+                    byte[] bytes=zooKeeper.getData(p2,true,null);
+                    if(bytes!=null){
+                        System.out.println(new String(bytes));
+                    }
+
+                    logger.debug("{}节点发生数据变化",p2);
+                }
+            }
+        } catch (KeeperException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public  void  createZ(){
+        try {
+            getZooKeeper();
+        } catch (IOException e) {
+            e.printStackTrace();
+            logger.error("启动zookeeper失败!",e);
+        }
     }
     public static ZooKeeper getZooKeeper() throws IOException {
         AssertUtil.notNull(ZookeeperAdder);
-        zooKeeper = new ZooKeeper(ZookeeperAdder,5000, new ZookeeperSession());
+        zooKeeper = new ZooKeeper(ZookeeperAdder,500, new ZookeeperSession());
         return zooKeeper;
     }
     public static void main(String[] args) throws KeeperException {

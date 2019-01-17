@@ -3,7 +3,7 @@
  */
 package com.thinkgem.jeesite.common.utils;
 
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -390,5 +390,35 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     	result.append(val.substring(1));
     	return result.toString();
     }
-    
+    /**
+     * @Author zhangsy
+     * @Description 将文件读取成String
+     * @Date 15:15 2019/1/16
+     * @Param [fileName]
+     * @return java.lang.String
+     * @Company 重庆尚渝网络科技
+     * @version v1000
+     **/
+	public static String readToString(String fileName) {
+		String encoding = "UTF-8";
+		File file = new File(fileName);
+		Long filelength = file.length();
+		byte[] filecontent = new byte[filelength.intValue()];
+		try {
+			FileInputStream in = new FileInputStream(file);
+			in.read(filecontent);
+			in.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		try {
+			return new String(filecontent, encoding);
+		} catch (UnsupportedEncodingException e) {
+			System.err.println("The OS does not support " + encoding);
+			e.printStackTrace();
+			return null;
+		}
+	}
 }

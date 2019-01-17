@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.ips.dao.PythonPkgDao">
+    
+	<sql id="pythonPkgColumns">
+				a.pk_id AS "pkId",
+				a.python_name AS "pythonName",
+				a.python_url AS "pythonUrl",
+				a.create_by AS "createBy.id",
+				a.create_date AS "createDate",
+				a.update_by AS "updateBy.id",
+				a.update_date AS "updateDate",
+				a.remarks AS "remarks",
+				a.del_flag AS "delFlag",
+				a.is_default AS "isDefault"
+	</sql>
+	
+	<sql id="pythonPkgJoins">
+	</sql>
+    
+	<select id="get" resultType="PythonPkg">
+		SELECT 
+			<include refid="pythonPkgColumns"/>
+		FROM tb_python_pkg a
+		<include refid="pythonPkgJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PythonPkg">
+		SELECT 
+			<include refid="pythonPkgColumns"/>
+		FROM tb_python_pkg a
+		<include refid="pythonPkgJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="pythonName != null and pythonName != ''">
+				AND a.python_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{pythonName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{pythonName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{pythonName},'%')</if>
+			</if>
+			<if test="pythonUrl != null and pythonUrl != ''">
+				AND a.python_url = #{pythonUrl}
+			</if>
+			<if test="isDefault != null and isDefault != ''">
+				AND a.is_default = #{isDefault}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PythonPkg">
+		SELECT 
+			<include refid="pythonPkgColumns"/>
+		FROM tb_python_pkg a
+		<include refid="pythonPkgJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO tb_python_pkg(
+			pk_id,
+			python_name,
+			python_url,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			is_default
+		) VALUES (
+			#{pkId},
+			#{pythonName},
+			#{pythonUrl},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{isDefault}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE tb_python_pkg SET 	
+			pk_id = #{pkId},
+			python_name = #{pythonName},
+			python_url = #{pythonUrl},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			is_default = #{isDefault}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="deleteById">
+		UPDATE tb_python_pkg SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

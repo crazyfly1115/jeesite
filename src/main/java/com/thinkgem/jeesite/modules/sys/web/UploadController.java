@@ -45,7 +45,7 @@ public class UploadController extends BaseController {
 	@RequiresPermissions("user")
 	@RequestMapping(value = "upload", method=RequestMethod.POST)
 	@ResponseBody
-	public String uploadtFile(MultipartFile file, RedirectAttributes redirectAttributes) {
+	public String uploadtFile(MultipartFile file,String toText,RedirectAttributes redirectAttributes) {
 		if(Global.isDemoMode()){
 			return new Ret(1,"演示模式无法操作!").toString();
 		}
@@ -67,15 +67,22 @@ public class UploadController extends BaseController {
 		if(!newfile.exists()){
 			newfile.mkdirs();
 		}
+		String path=Global.getUserfilesBaseDir() + File.separator +newpath+ newfileName;
 		try {
-			file.transferTo(new File( Global.getUserfilesBaseDir() + File.separator +newpath+ newfileName));
+
+			file.transferTo(new File(path));
 		} catch (IOException e) {
 			e.printStackTrace();
 			logger.error("IO",e);
 			throw  new RuntimeException("IO错误");
 		}
 		Ret ret=new Ret(0, "上传文件成功");
-		ret.putMap("url",   File.separator +newpath+ newfileName);
+		if("0".equals(toText)){
+			String rs=StringUtils.readToString(path);
+			ret.putMap("text",rs);
+		}
+
+		ret.putMap("url",   newpath.replaceAll("\\\\","/")+ newfileName);
 		ret.putMap("serverurl", Global.getUserfilesWebUrl());
 		return ret.toString();
 	}

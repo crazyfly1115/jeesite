@@ -6,8 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.mapper.JsonMapper;
+import com.thinkgem.jeesite.common.utils.AssertUtil;
 import com.thinkgem.jeesite.common.utils.Encoding;
+import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.ips.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,9 +35,32 @@ public class ReptileTaskService extends CrudService<ReptileTaskDao, ReptileTask>
     private ReptileServiceService reptileService;
     @Autowired
     private CollectFieldService collectFieldService;
+    @Autowired
+    private  CrawlerService crawlerService;
+    @Autowired
+    private  DatabaseService databaseService;
+    @Autowired
+    private DuridService duridService;
     @Override
     @Transactional
     public void save(ReptileTask entity) {
+        // TODO 1.验证是否选择数据库,以及是否选择数据表,以及是否选择爬虫策略.
+        AssertUtil.notNull(entity.getCrawlerId(),"请选择至少一个爬虫");
+        AssertUtil.notNull(entity.getDatabaseId(),"请选择一个存储数据服务");
+
+        AssertUtil.notNull(entity.getCrawlerId().getId(),"爬虫服务id为空");
+        AssertUtil.notNull(entity.getDatabaseId().getId(),"存储数据id为空");
+
+        Crawler crawler=crawlerService.get(entity.getCrawlerId().getId());
+        String json=StringUtils.readToString(Global.getUserfilesBaseDir()+crawler.getCrawlerUrl());
+        System.out.println(json);
+
+
+        Database database=databaseService.get(entity.getDatabaseId().getId());
+        duridService.createTable(database);
+
+
+
         super.save(entity);
         serviceTaskService.deleteByTaskId(entity.getId());
         for (ReptileService rs:entity.getServiceList()){

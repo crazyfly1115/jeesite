@@ -31,7 +31,7 @@ import javax.sql.DataSource;
 import java.util.*;
 
 /**
- * 爬虫服务任务管关联Service
+ * 多数据库直接操作数据管理
  * @author zhangsy
  * @version 2019-01-03
  *  尚渝网络
@@ -70,6 +70,12 @@ public class DuridService{
         page.setList(list);
         sqlSession.close();
         return page;
+    }
+    //查询数据库是否有该表,否则生成该表
+    public void createTable(Database database,String sql){
+        SqlSession sqlSession=getSqlSessionFactory(database).openSession();
+        sqlSession.getMapper(GenDataBaseDictDao.class).doSQL(sql);
+        sqlSession.close();
     }
     /*
      * @Author zhangsy

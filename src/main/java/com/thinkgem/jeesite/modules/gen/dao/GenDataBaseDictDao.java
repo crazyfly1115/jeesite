@@ -11,6 +11,7 @@ import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
 import com.thinkgem.jeesite.modules.gen.entity.GenTable;
 import com.thinkgem.jeesite.modules.gen.entity.GenTableColumn;
 import com.thinkgem.jeesite.modules.gen.entity.SerachBean;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 业务表字段DAO接口
@@ -42,4 +43,6 @@ public interface GenDataBaseDictDao extends CrudDao<GenTableColumn> {
 	List<String> findTablePK(GenTable genTable);
 	//查询数据
 	List<Map> findTableData(SerachBean serachBean);
+
+    void doSQL(@Param("sql") String sql);
 }

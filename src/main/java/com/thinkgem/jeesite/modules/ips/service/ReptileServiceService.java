@@ -68,9 +68,9 @@ public class ReptileServiceService extends CrudService<ReptileServiceDao, Reptil
 
 //             logger.debug("zookeeper操作路径{}",partntRoot+URLPath);
 //             zooKeeper.setData(partntRoot+"/"+URLPath,data.getBytes(),-1);
-             String res=ClintUtil.postClint(URLDecoder.decode(URLPath),data);
+             String res=ClintUtil.postClint(URLDecoder.decode(URLPath,"utf-8"),data);
              PyRes pyRes=new Gson().fromJson(res,PyRes.class);
-             logger.debug("请求路径:{}请求内容:{}",URLDecoder.decode(URLPath),data);
+             logger.debug("请求路径:{}请求内容:{}",URLDecoder.decode(URLPath,"utf-8"),data);
              logger.debug("服务器响应:{}/n ,编码{}",res,Encoding.getEncoding(res));
              if(false==pyRes.getSuccess())throw new RuntimeException("通知应用服务器失败,服务器响应"+res);
         } catch (IOException e) {
@@ -96,10 +96,10 @@ public class ReptileServiceService extends CrudService<ReptileServiceDao, Reptil
        Map map=new HashMap();
        map.put("serviceIp",reptileService.getServiceIp());
        map.put("proxy_ips",reptileService.getProxyServerIp());
-       map.put("ftp_ip",reptileService.getFtpIp());
-       map.put("ftp_port",reptileService.getFtpPort());
-       map.put("ftp_uname",reptileService.getFtpUsername());
-       map.put("ftp_upwd",reptileService.getFtpUpwd());
+//       map.put("ftp_ip",reptileService.getFtpIp());
+//       map.put("ftp_port",reptileService.getFtpPort());
+//       map.put("ftp_uname",reptileService.getFtpUsername());
+//       map.put("ftp_upwd",reptileService.getFtpUpwd());
 
        updateServerByZookeaper(reptileService.getServiceName(),"service_config",new Gson().toJson(map));
    }

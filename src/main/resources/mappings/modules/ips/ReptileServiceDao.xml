@@ -4,15 +4,12 @@
     
 	<sql id="reptileServiceColumns">
 				a.id AS "id",
+				a.service_name AS "serviceName",
 				a.service_ip AS "serviceIp",
 				a.service_port AS "servicePort",
-				a.service_name AS "serviceName",
 				a.proxy_server_ip AS "proxyServerIp",
+				a.service_state AS "serviceState",
 				a.create_by AS "createBy.id",
-				a.ftp_ip AS "ftpIp",
-				a.ftp_port AS "ftpPort",
-				a.ftp_username AS "ftpUsername",
-				a.ftp_upwd AS "ftpUpwd",
 				a.create_date AS "createDate",
 				a.update_by AS "updateBy.id",
 				a.update_date AS "updateDate",
@@ -38,6 +35,12 @@
 		<include refid="reptileServiceJoins"/>
 		<where>
 			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="serviceName != null and serviceName != ''">
+				AND a.service_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{serviceName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{serviceName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{serviceName},'%')</if>
+			</if>
 			<if test="serviceIp != null and serviceIp != ''">
 				AND a.service_ip LIKE 
 					<if test="dbName == 'oracle'">'%'||#{serviceIp}||'%'</if>
@@ -50,41 +53,14 @@
 					<if test="dbName == 'mssql'">'%'+#{servicePort}+'%'</if>
 					<if test="dbName == 'mysql'">concat('%',#{servicePort},'%')</if>
 			</if>
-			<if test="serviceName != null and serviceName != ''">
-				AND a.service_name LIKE 
-					<if test="dbName == 'oracle'">'%'||#{serviceName}||'%'</if>
-					<if test="dbName == 'mssql'">'%'+#{serviceName}+'%'</if>
-					<if test="dbName == 'mysql'">concat('%',#{serviceName},'%')</if>
-			</if>
 			<if test="proxyServerIp != null and proxyServerIp != ''">
 				AND a.proxy_server_ip LIKE 
 					<if test="dbName == 'oracle'">'%'||#{proxyServerIp}||'%'</if>
 					<if test="dbName == 'mssql'">'%'+#{proxyServerIp}+'%'</if>
 					<if test="dbName == 'mysql'">concat('%',#{proxyServerIp},'%')</if>
 			</if>
-			<if test="ftpIp != null and ftpIp != ''">
-				AND a.ftp_ip LIKE 
-					<if test="dbName == 'oracle'">'%'||#{ftpIp}||'%'</if>
-					<if test="dbName == 'mssql'">'%'+#{ftpIp}+'%'</if>
-					<if test="dbName == 'mysql'">concat('%',#{ftpIp},'%')</if>
-			</if>
-			<if test="ftpPort != null and ftpPort != ''">
-				AND a.ftp_port LIKE 
-					<if test="dbName == 'oracle'">'%'||#{ftpPort}||'%'</if>
-					<if test="dbName == 'mssql'">'%'+#{ftpPort}+'%'</if>
-					<if test="dbName == 'mysql'">concat('%',#{ftpPort},'%')</if>
-			</if>
-			<if test="ftpUsername != null and ftpUsername != ''">
-				AND a.ftp_username LIKE 
-					<if test="dbName == 'oracle'">'%'||#{ftpUsername}||'%'</if>
-					<if test="dbName == 'mssql'">'%'+#{ftpUsername}+'%'</if>
-					<if test="dbName == 'mysql'">concat('%',#{ftpUsername},'%')</if>
-			</if>
-			<if test="ftpUpwd != null and ftpUpwd != ''">
-				AND a.ftp_upwd LIKE 
-					<if test="dbName == 'oracle'">'%'||#{ftpUpwd}||'%'</if>
-					<if test="dbName == 'mssql'">'%'+#{ftpUpwd}+'%'</if>
-					<if test="dbName == 'mysql'">concat('%',#{ftpUpwd},'%')</if>
+			<if test="serviceState != null and serviceState != ''">
+				AND a.service_state = #{serviceState}
 			</if>
 		</where>
 		<choose>
@@ -118,15 +94,12 @@
 	<insert id="insert">
 		INSERT INTO tb_service(
 			id,
+			service_name,
 			service_ip,
 			service_port,
-			service_name,
 			proxy_server_ip,
+			service_state,
 			create_by,
-			ftp_ip,
-			ftp_port,
-			ftp_username,
-			ftp_upwd,
 			create_date,
 			update_by,
 			update_date,
@@ -134,15 +107,12 @@
 			del_flag
 		) VALUES (
 			#{id},
+			#{serviceName},
 			#{serviceIp},
 			#{servicePort},
-			#{serviceName},
 			#{proxyServerIp},
+			#{serviceState},
 			#{createBy.id},
-			#{ftpIp},
-			#{ftpPort},
-			#{ftpUsername},
-			#{ftpUpwd},
 			#{createDate},
 			#{updateBy.id},
 			#{updateDate},
@@ -153,14 +123,11 @@
 	
 	<update id="update">
 		UPDATE tb_service SET 	
+			service_name = #{serviceName},
 			service_ip = #{serviceIp},
 			service_port = #{servicePort},
-			service_name = #{serviceName},
 			proxy_server_ip = #{proxyServerIp},
-			ftp_ip = #{ftpIp},
-			ftp_port = #{ftpPort},
-			ftp_username = #{ftpUsername},
-			ftp_upwd = #{ftpUpwd},
+			service_state = #{serviceState},
 			update_by = #{updateBy.id},
 			update_date = #{updateDate},
 			remarks = #{remarks},

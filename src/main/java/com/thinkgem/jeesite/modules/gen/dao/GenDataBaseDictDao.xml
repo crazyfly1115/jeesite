@@ -110,5 +110,8 @@
 			AND au.COLUMN_KEY='PRI' AND au.TABLE_NAME = (#{name})
 		</if>
 	</select>
-	
+	<insert id="doSQL">
+
+		${sql}
+	</insert>
 </mapper>

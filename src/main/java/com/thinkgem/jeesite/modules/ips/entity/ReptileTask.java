@@ -11,7 +11,7 @@ import com.thinkgem.jeesite.common.persistence.DataEntity;
 /**
  * 爬虫任务Entity
  * @author zhangsy
- * @version 2019-01-07
+ * @version 2019-01-15
  * 尚渝网络
  */
 public class ReptileTask extends DataEntity<ReptileTask> {
@@ -25,9 +25,11 @@ public class ReptileTask extends DataEntity<ReptileTask> {
 	private String taskCron;		// cron表达式
 	private String retryTimes;		// 重试次数
 	private String urlLayers;		// 抓取层数
-	private String taskPython;		// python路径
-	private String taskParse;		// 任务解析文件路径
-	private CollectData collectDataId;		// 网站采集数据
+	private String poiType;		// 关键字
+	private Website websiteId;		// 网站
+	private Database databaseId;		// 数据库
+	private Crawler crawlerId;		// 爬虫
+	private StorageService storageServiceId;		// 存储服务
 	private List<ReptileService> serviceList;
 	
 	public ReptileTask() {
@@ -110,30 +112,44 @@ public class ReptileTask extends DataEntity<ReptileTask> {
 		this.urlLayers = urlLayers;
 	}
 	
-	@Length(min=0, max=300, message="python路径长度必须介于 0 和 300 之间")
-	public String getTaskPython() {
-		return taskPython;
+	public String getPoiType() {
+		return poiType;
 	}
 
-	public void setTaskPython(String taskPython) {
-		this.taskPython = taskPython;
+	public void setPoiType(String poiType) {
+		this.poiType = poiType;
 	}
 	
-	@Length(min=0, max=300, message="任务解析文件路径长度必须介于 0 和 300 之间")
-	public String getTaskParse() {
-		return taskParse;
+	public Website getWebsiteId() {
+		return websiteId;
 	}
 
-	public void setTaskParse(String taskParse) {
-		this.taskParse = taskParse;
+	public void setWebsiteId(Website websiteId) {
+		this.websiteId = websiteId;
 	}
 	
-	public CollectData getCollectDataId() {
-		return collectDataId;
+	public Database getDatabaseId() {
+		return databaseId;
 	}
 
-	public void setCollectDataId(CollectData collectDataId) {
-		this.collectDataId = collectDataId;
+	public void setDatabaseId(Database databaseId) {
+		this.databaseId = databaseId;
+	}
+	
+	public Crawler getCrawlerId() {
+		return crawlerId;
+	}
+
+	public void setCrawlerId(Crawler crawlerId) {
+		this.crawlerId = crawlerId;
+	}
+	
+	public StorageService getStorageServiceId() {
+		return storageServiceId;
+	}
+
+	public void setStorageServiceId(StorageService storageServiceId) {
+		this.storageServiceId = storageServiceId;
 	}
 
 	public List<ReptileService> getServiceList() {
