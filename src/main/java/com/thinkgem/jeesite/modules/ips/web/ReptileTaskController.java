@@ -100,7 +100,7 @@ public class ReptileTaskController extends BaseController {
 		ReptileTask reptileTask=reptileTaskService.get(id);
 		AssertUtil.notNull(reptileTask,"未查询到相关数据");
 		//TO-DO 操作zookeeper的相关数据
-		reptileTaskService.taskAdd(reptileTask);
+		reptileTaskService.startTask(reptileTask);
 		return new Ret(0,"更新成功").toString();
 	}
 	@RequiresPermissions("ips:reptileTask:view")

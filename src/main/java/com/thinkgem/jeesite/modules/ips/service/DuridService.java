@@ -74,8 +74,19 @@ public class DuridService{
     //查询数据库是否有该表,否则生成该表
     public void createTable(Database database,String sql){
         SqlSession sqlSession=getSqlSessionFactory(database).openSession();
-        sqlSession.getMapper(GenDataBaseDictDao.class).doSQL(sql);
+        sqlSession.getMapper(GenDataBaseDictDao.class).createSQL(sql);
         sqlSession.close();
+    }
+
+    //是否存在该表 存在返回false
+    public boolean existTable(Database database,String table){
+        SqlSession sqlSession=getSqlSessionFactory(database).openSession();
+        GenTable g=new GenTable();
+        g.setName(table);
+        List<GenTable> list=sqlSession.getMapper(GenDataBaseDictDao.class).findTableList(g);
+        sqlSession.close();
+        if(list.size()==0)return true;
+        return false;
     }
     /*
      * @Author zhangsy

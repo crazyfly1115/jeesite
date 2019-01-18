@@ -1,6 +1,9 @@
 package com.thinkgem.jeesite.modules.ips.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -35,14 +38,24 @@ public class CrawlerService extends CrudService<CrawlerDao, Crawler> {
      * @Company 重庆尚渝网络科技
      * @version v1000
      **/
-    public  String   ParserJsonToSql(String json,String tableName,boolean isDrop){
-        JsonParser parser = new JsonParser();
-        JsonElement jsonElement=parser.parse(json);
-        JsonArray sub=jsonElement.getAsJsonObject().get("items").getAsJsonArray().get(0).getAsJsonObject().get("subitem").getAsJsonArray();
-        List<Subitem> subitemList=new Gson().fromJson(new Gson().toJsonTree(sub),new TypeToken<List<Subitem>>(){}.getType());
-        return getSQL(subitemList,tableName,isDrop);
+    public   List<String>   ParserJsonToSql(String json,String tableName,boolean isDrop){
+        try{
+
+            List<String> sqls=new ArrayList<String>();
+            JsonParser parser = new JsonParser();
+            JsonElement jsonElement=parser.parse(json);
+            JsonArray sub=jsonElement.getAsJsonObject().get("items").getAsJsonArray().get(0).getAsJsonObject().get("subitem").getAsJsonArray();
+            List<Subitem> subitemList=new Gson().fromJson(new Gson().toJsonTree(sub),new TypeToken<List<Subitem>>(){}.getType());
+             getSQL(subitemList,tableName,isDrop,sqls);
+            return  sqls;
+        }catch (RuntimeException e){
+            throw  e;
+        }catch (Exception e){
+            logger.error("解析策略文件错误",e);
+            throw  new RuntimeException("解析爬虫文件出错,请检查爬虫文件");
+        }
     }
-    private  String  getSQL(List<Subitem> subitemList,String table,boolean isDrop) {
+    private  String  getSQL(List<Subitem> subitemList,String table,boolean isDrop,List sqls) {
         String sql="";
         if(isDrop){
            sql+= "DROP TABLE IF EXISTS "+table+"; ";
@@ -54,6 +67,7 @@ public class CrawlerService extends CrudService<CrawlerDao, Crawler> {
         }
         sql+="	id varchar(64) NOT NULL DEFAULT '',\n" +
                 "  grab_time datetime DEFAULT NULL,\n" +
+                "  fk_id varchar(64)  DEFAULT NULL,\n" +
                 "  create_by varchar(64) NOT NULL DEFAULT '1' COMMENT '创建者',\n" +
                 "  create_date datetime NOT NULL COMMENT '创建时间',\n" +
                 "  update_by varchar(64) NOT NULL COMMENT '更新者',\n" +
@@ -61,10 +75,11 @@ public class CrawlerService extends CrudService<CrawlerDao, Crawler> {
                 "  remarks varchar(255) DEFAULT NULL COMMENT '备注信息',\n" +
                 "  del_flag char(1) NOT NULL DEFAULT '0' COMMENT '删除标记',\n" +
                 "  PRIMARY KEY (id)\n" +
-                ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='业务数据';";
+                ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='业务数据'";
+        sqls.add(sql);
         for (Subitem subitem:subitemList){
             if (subitem.getSubitem() != null) {
-                sql+= getSQL(subitem.getSubitem(),table+=subitem.getName(),isDrop);
+                getSQL(subitem.getSubitem(),table+=("_"+subitem.getName()),isDrop,sqls);
             }
         }
         return sql;
@@ -80,4 +95,41 @@ public class CrawlerService extends CrudService<CrawlerDao, Crawler> {
         }
     }
 
+
+    /**
+      *获取主键
+     **/
+    public   Map   ParserJsonToPk(String json,String tableName){
+        try{
+
+            List<String> sqls=new ArrayList<String>();
+            JsonParser parser = new JsonParser();
+            JsonElement jsonElement=parser.parse(json);
+            JsonArray sub=jsonElement.getAsJsonObject().get("items").getAsJsonArray().get(0).getAsJsonObject().get("subitem").getAsJsonArray();
+            List<Subitem> subitemList=new Gson().fromJson(new Gson().toJsonTree(sub),new TypeToken<List<Subitem>>(){}.getType());
+            Map map=new HashMap();
+            getPk(subitemList,tableName,map);
+            return  map;
+        }catch (RuntimeException e){
+            throw  e;
+        }catch (Exception e){
+            logger.error("解析策略文件错误",e);
+            throw  new RuntimeException("解析爬虫文件出错,请检查爬虫文件");
+        }
+    }
+    private  void  getPk(List<Subitem> subitemList,String table,Map map) {
+        List<String> pks=new ArrayList<String>();
+        for (Subitem subitem:subitemList){
+            checkKeyWord(subitem.getName());
+            if("0".equals(subitem.getIs_update())){
+                pks.add(subitem.getName());
+            }
+        }
+        for (Subitem subitem:subitemList){
+            if (subitem.getSubitem() != null) {
+                getPk(subitem.getSubitem(),table+=("_"+subitem.getName()),map);
+            }
+        }
+        map.put(table,pks);
+    }
 }

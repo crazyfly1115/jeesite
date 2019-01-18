@@ -58,8 +58,8 @@ public class ReptileServiceController extends BaseController {
 	@RequestMapping(value = {"list"})
 	@ResponseBody
 	public String list(ReptileService reptileService, HttpServletRequest request, HttpServletResponse response) {
-		Page<ReptileService> page = reptileServiceService.findPage(new Page<ReptileService>(request, response), reptileService);
-		return new Ret("data",page).toString();
+
+		return new Ret("data",reptileServiceService.getServer()).toString();
 	}
 	@RequiresPermissions("ips:reptileService:view")
 	@RequestMapping(value = {"listAll"})
@@ -95,7 +95,7 @@ public class ReptileServiceController extends BaseController {
 	public String updateServer(@RequestParam(required = true) String id) {
 
 
-		reptileServiceService.serviceConfig(reptileServiceService.get(id));
+		reptileServiceService.serviceConfig(id);
 
 		return new Ret().toString();
 	}

@@ -20,6 +20,7 @@ import com.thinkgem.jeesite.modules.ips.dao.CollectTableDao;
  * @version 2019-01-05
  *  尚渝网络
  */
+@Deprecated
 @Service
 @Transactional(readOnly = true)
 public class CollectTableService extends CrudService<CollectTableDao, CollectTable> {

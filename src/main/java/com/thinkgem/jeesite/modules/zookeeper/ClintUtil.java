@@ -9,7 +9,7 @@ import java.net.*;
 
 public class ClintUtil {
     public static String postClint(String url,String body){
-        QuickHttp qk=new QuickHttp().post().url(url).setBodyContent(body).addHeader("Content-Type","application/json;charset=utf-8").setContentType(ContentType.create("application/json","utf-8"));
+        QuickHttp qk=new QuickHttp().post().url(url).setBodyContent(body).addHeader("Content-Type","application/json;charset=utf-8").setContentType(ContentType.create("application/json","utf-8")).setConnectionTimeout(25*1000);
         return qk.text();
 //        return sendPost(url,body);
     }

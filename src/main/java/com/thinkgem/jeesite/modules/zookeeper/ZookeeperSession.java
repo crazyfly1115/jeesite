@@ -53,16 +53,16 @@ public class ZookeeperSession  implements Watcher {
     }
 
     public  void  createZ(){
-        try {
             getZooKeeper();
+    }
+    public static ZooKeeper getZooKeeper() {
+        AssertUtil.notNull(ZookeeperAdder);
+        try {
+            zooKeeper = new ZooKeeper(ZookeeperAdder,500, new ZookeeperSession());
         } catch (IOException e) {
             e.printStackTrace();
-            logger.error("启动zookeeper失败!",e);
+            throw  new RuntimeException("连接zookeeper失败,无法获取容器数据");
         }
-    }
-    public static ZooKeeper getZooKeeper() throws IOException {
-        AssertUtil.notNull(ZookeeperAdder);
-        zooKeeper = new ZooKeeper(ZookeeperAdder,500, new ZookeeperSession());
         return zooKeeper;
     }
     public static void main(String[] args) throws KeeperException {

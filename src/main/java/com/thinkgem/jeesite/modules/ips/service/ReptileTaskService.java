@@ -12,6 +12,7 @@ import com.thinkgem.jeesite.common.utils.AssertUtil;
 import com.thinkgem.jeesite.common.utils.Encoding;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.ips.entity.*;
+import org.activiti.engine.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +42,9 @@ public class ReptileTaskService extends CrudService<ReptileTaskDao, ReptileTask>
     private  DatabaseService databaseService;
     @Autowired
     private DuridService duridService;
+
+    @Autowired
+    private  StorageServiceService storageService;
     @Override
     @Transactional
     public void save(ReptileTask entity) {
@@ -51,104 +55,92 @@ public class ReptileTaskService extends CrudService<ReptileTaskDao, ReptileTask>
         AssertUtil.notNull(entity.getCrawlerId().getId(),"爬虫服务id为空");
         AssertUtil.notNull(entity.getDatabaseId().getId(),"存储数据id为空");
 
+
+        AssertUtil.notNull(entity.getTableName(),"表名不能为空");
         Crawler crawler=crawlerService.get(entity.getCrawlerId().getId());
-        String json=StringUtils.readToString(Global.getUserfilesBaseDir()+crawler.getCrawlerUrl());
-        System.out.println(json);
 
 
         Database database=databaseService.get(entity.getDatabaseId().getId());
-        duridService.createTable(database);
+        if(duridService.existTable(database,entity.getTableName())){
+            String json=StringUtils.readToString(Global.getUserfilesBaseDir()+crawler.getCrawlerUrl());
+            logger.debug("cw:文件内容{}",json);
+
+            List<String> sqls=crawlerService.ParserJsonToSql(json,entity.getTableName(),true);
+            for (String sql : sqls){
+
+                logger.debug("任务执行建表SQL:{}",sql);
+                duridService.createTable(database,sql);
+            }
+        }
 
 
 
         super.save(entity);
         serviceTaskService.deleteByTaskId(entity.getId());
-        for (ReptileService rs:entity.getServiceList()){
+        for (ServiceTask rs:entity.getServiceList()){
             ServiceTask sc=new ServiceTask();
             sc.setTaskId(entity.getId());
-            sc.setServiceId(rs.getId());
+            sc.setServiceIp(rs.getServiceIp());
             serviceTaskService.save(sc);
         }
     }
-    public void taskAdd(ReptileTask reptileTask){
+    /**
+     * 启动一个爬虫任务
+     * @param
+     * @return
+     */
+    public void startTask(ReptileTask reptileTask){
 
-        List<Map> list=dao.getTask(reptileTask.getId());
-        if(list==null||list.size()==0) throw new RuntimeException("该任务指定爬虫服务");
-        for (Map map:list){
+        //todo 1.先调用存储服务接口,2在调用爬虫容器接口
 
-          List<CollectField> collectFieldList= collectFieldService.findListByTableId(map.get("table_id").toString());
-          List<String> pks=new ArrayList<String>();
-          List<String> columns=new ArrayList<String>();
-          for (CollectField collectField:collectFieldList){
-              columns.add(collectField.getFieldCode());
-              if("1".equals(collectField.getIsUpdate())){
-                pks.add(collectField.getFieldCode());
-              }
-          }
-            Map db=(Map) map.get("task_bind_db");
-            db.put("pk",pks);
-            db.put("columns",columns);
+        //赋值未完成
+        reptileTask=get(reptileTask.getId());
 
-            map.put("task_bind_db",db);
-            map.put("task_topic","TaskTopic");
-            map.put("task_tag","TaskTag");
-            map.put("poi_kword",dao.getKeyWords());
-            reptileService.updateServerByZookeaper((String)map.get("service_name"),"task_add",new JsonMapper(JsonInclude.Include.ALWAYS).toJson(map));
 
-//        String a="{\n" +
-//                "    \"task_id\": \"task_id20190117zyxy\",\n" +
-//                "    \"task_name\": \"百度POI-职业学院\",\n" +
-//                "    \"task_url\": \"http://api.map.baidu.com/place/v2/search?scop=2&query=%e7%be%8e%e9%a3%9f&region=chongqing&output=json&ak=Ucmrifav2HUpUFp3FgFbTEkk4NGEuWTo&city_limit=true&page_num=0\",\n" +
-//                "    \"task_file\": \"/poi/baidu/v1.0/baidupoi.cw\",\n" +
-//                "    \"task_stime\": \"0/20 * * * * ?\",\n" +
-//                "    \"task_topic\":\"TaskTopic\",\n" +
-//                "    \"task_tag\":\"TaskTag\",\n" +
-//                "    \"task_bind_db\": {\n" +
-//                "        \"db_ip\": \"127.0.0.1\",\n" +
-//                "        \"db_port\": \"3306\",\n" +
-//                "        \"db_name\": \"crawler\",\n" +
-//                "        \"db_username\": \"crawler\",\n" +
-//                "        \"db_password\": \"crawler\",\n" +
-//                "        \"tb_name\": \"tb_baidu_poi_food_01\",\n" +
-//                "        \"child_tb\": [{\n" +
-//                "                \"field_name\": \"address\",\n" +
-//                "                \"child_tb_name\": \"tb_child_address\",\n" +
-//                "                \"db_ip\": \"192.168.1.2\",\n" +
-//                "                \"db_port\": \"3306\",\n" +
-//                "                \"db_name\": \"crawler\",\n" +
-//                "                \"db_username\": \"crawler\",\n" +
-//                "                \"db_password\": \"crawler\",\n" +
-//                "                \"tb_name\": \"tb_baidu_poi_food_01\"\n" +
-//                "            },\n" +
-//                "            {\n" +
-//                "                \"field_name\": \"food_type\",\n" +
-//                "                \"child_tb_name\": \"tb_child_food_type\"\n" +
-//                "            }\n" +
-//                "        ]\n" +
-//                "    },\n" +
-//                "    \"task_status\": false,\n" +
-//                "    \"task_type\": \"BDPOI\",\n" +
-//                "    \"poi_key\": \"Ucmrifav2HUpUFp3FgFbTEkk4NGEuWTo\",\n" +
-//                "    \"poi_kword\": [\"职业学院\"],\n" +
-//                "    \"task_start_time\": \"2019-01-01 00:00:00\",\n" +
-//                "    \"retry_times\": 3,\n" +
-//                "    \"ftp_dir\": \"\"\n" +
-//                "}";
-//            System.out.println(Encoding.getEncoding(a));
-//            System.out.println(Encoding.getEncoding(new JsonMapper(JsonInclude.Include.ALWAYS).toJson(map)));
-//            reptileService.updateServerByZookeaper((String)map.get("service_name"),"task_add",a);
+        storageService.noticeDataInput(reptileTask);
+
+        Map map=getTask(reptileTask.getId());
+
+        if(reptileTask.getServiceList()==null||reptileTask.getServiceList().size()==0) throw new RuntimeException("该任务未指定爬虫服务");
+        //
+        for (ServiceTask serviceTask:reptileTask.getServiceList()){
+            //todo  暂时将py 地址写死,等正式后将参数修改
+            map.put("python_file","/python/poi/v1/stcrawler.rar");
+            reptileService.updateServerByZookeaper(serviceTask.getServiceIp(),"task_add",new JsonMapper(JsonInclude.Include.ALWAYS).toJson(map));
+
         }
 
     }
 
     public void changeState(ReptileTask reptileTask,int state) {
-        List<Map> list=dao.getTask(reptileTask.getId());
-        for (Map map:list){
+        reptileTask=get(reptileTask.getId());
+        Map map=getTask(reptileTask.getId());
+        for (ServiceTask serviceTask:reptileTask.getServiceList()){
             Map rs=new HashMap();
             rs.put("task_name",map.get("task_name"));
             rs.put("schedule_type",state);
             rs.put("task_id",map.get("task_id"));
-            reptileService.updateServerByZookeaper((String)map.get("service_name"),"task_schedule",new JsonMapper(JsonInclude.Include.ALWAYS).toJson(rs));
+
+
+
+            reptileService.updateServerByZookeaper(serviceTask.getServiceIp(),"task_schedule",new JsonMapper(JsonInclude.Include.ALWAYS).toJson(rs));
         }
+    }
+
+    @Override
+    public ReptileTask get(String id) {
+        ReptileTask reptileTask=super.get(id);
+        ServiceTask serviceTask=new ServiceTask();
+        serviceTask.setTaskId(id);
+        reptileTask.setServiceList(serviceTaskService.findList(serviceTask));
+        reptileTask.setDatabaseId(databaseService.get(reptileTask.getDatabaseId().getId()));
+        reptileTask.setCrawlerId(crawlerService.get(reptileTask.getCrawlerId().getId()));
+        return super.get(id);
+    }
+
+    public  Map getTask(String id){
+        Map map=dao.getTask(id);
+        map.put("task_file",Global.getUserfilesWebUrl()+map.get("task_file"));
+        return map;
     }
 }

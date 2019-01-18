@@ -16,6 +16,7 @@ import com.thinkgem.jeesite.modules.ips.dao.CollectDataDao;
  * @version 2019-01-04
  *  尚渝网络
  */
+@Deprecated
 @Service
 @Transactional(readOnly = true)
 public class CollectDataService extends CrudService<CollectDataDao, CollectData> {

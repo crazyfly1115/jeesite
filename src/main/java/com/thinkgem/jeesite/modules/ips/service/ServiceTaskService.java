@@ -13,14 +13,18 @@ import com.thinkgem.jeesite.modules.ips.dao.ServiceTaskDao;
 /**
  * 爬虫服务任务管关联Service
  * @author zhangsy
- * @version 2019-01-07
+ * @version 2019-01-18
  *  尚渝网络
  */
 @Service
 @Transactional(readOnly = true)
 public class ServiceTaskService extends CrudService<ServiceTaskDao, ServiceTask> {
-
     public void deleteByTaskId(String taskid) {
         dao.deleteByTaskId(taskid);
+    }
+    public  List<ServiceTask> findBytaskId(String taskid){
+        ServiceTask serviceTask=new ServiceTask();
+        serviceTask.setTaskId(taskid);
+        return super.findList(serviceTask);
     }
 }

@@ -8,11 +8,10 @@ import org.apache.ibatis.annotations.Param;
 /**
  * 爬虫服务任务管关联DAO接口
  * @author zhangsy
- * @version 2019-01-07
+ * @version 2019-01-18
  * 尚渝网络
  */
 @MyBatisDao
 public interface ServiceTaskDao extends CrudDao<ServiceTask> {
-
     void deleteByTaskId(@Param("taskId") String taskid);
 }

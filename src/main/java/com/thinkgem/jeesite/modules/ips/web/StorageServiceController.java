@@ -14,7 +14,7 @@ import com.thinkgem.jeesite.modules.ips.entity.StorageService;
 import com.thinkgem.jeesite.modules.ips.service.StorageServiceService;
 
 /**
- * 数据存储Controller
+ * 存储容器
  * @author zhangsy
  * @version 2019-01-16
  * 尚渝网络
@@ -58,8 +58,8 @@ public class StorageServiceController extends BaseController {
 	@RequestMapping(value = {"list"})
 	@ResponseBody
 	public String list(StorageService storageService, HttpServletRequest request, HttpServletResponse response) {
-		Page<StorageService> page = storageServiceService.findPage(new Page<StorageService>(request, response), storageService);
-		return new Ret("data",page).toString();
+
+		return new Ret("data",storageServiceService.getListByZookeeper()).toString();
 	}
 	@RequiresPermissions("ips:storageService:view")
 	@RequestMapping(value = {"getById"})

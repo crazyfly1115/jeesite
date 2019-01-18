@@ -3,7 +3,7 @@
 <mapper namespace="com.thinkgem.jeesite.modules.ips.dao.PythonPkgDao">
     
 	<sql id="pythonPkgColumns">
-				a.pk_id AS "pkId",
+				a.id AS "id",
 				a.python_name AS "pythonName",
 				a.python_url AS "pythonUrl",
 				a.create_by AS "createBy.id",
@@ -76,7 +76,7 @@
 	
 	<insert id="insert">
 		INSERT INTO tb_python_pkg(
-			pk_id,
+			id,
 			python_name,
 			python_url,
 			create_by,
@@ -87,7 +87,7 @@
 			del_flag,
 			is_default
 		) VALUES (
-			#{pkId},
+			  #{id},
 			#{pythonName},
 			#{pythonUrl},
 			#{createBy.id},
@@ -102,7 +102,6 @@
 	
 	<update id="update">
 		UPDATE tb_python_pkg SET 	
-			pk_id = #{pkId},
 			python_name = #{pythonName},
 			python_url = #{pythonUrl},
 			update_by = #{updateBy.id},

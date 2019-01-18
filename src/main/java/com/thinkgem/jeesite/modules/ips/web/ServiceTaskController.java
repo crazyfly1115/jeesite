@@ -16,7 +16,7 @@ import com.thinkgem.jeesite.modules.ips.service.ServiceTaskService;
 /**
  * 爬虫服务任务管关联Controller
  * @author zhangsy
- * @version 2019-01-07
+ * @version 2019-01-18
  * 尚渝网络
  */
 @Controller

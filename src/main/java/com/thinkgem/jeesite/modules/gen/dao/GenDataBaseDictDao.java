@@ -44,5 +44,5 @@ public interface GenDataBaseDictDao extends CrudDao<GenTableColumn> {
 	//查询数据
 	List<Map> findTableData(SerachBean serachBean);
 
-    void doSQL(@Param("sql") String sql);
+    void createSQL(@Param("sql") String sql);
 }

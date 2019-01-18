@@ -24,7 +24,7 @@ import com.thinkgem.jeesite.modules.ips.entity.ReptileService;
 import com.thinkgem.jeesite.modules.ips.dao.ReptileServiceDao;
 
 /**
- * 服务器管理Service
+ * 爬虫容器
  * @author zhangsy
  * @version 2019-01-03
  *  尚渝网络
@@ -71,7 +71,7 @@ public class ReptileServiceService extends CrudService<ReptileServiceDao, Reptil
              String res=ClintUtil.postClint(URLDecoder.decode(URLPath,"utf-8"),data);
              PyRes pyRes=new Gson().fromJson(res,PyRes.class);
              logger.debug("请求路径:{}请求内容:{}",URLDecoder.decode(URLPath,"utf-8"),data);
-             logger.debug("服务器响应:{}/n ,编码{}",res,Encoding.getEncoding(res));
+             logger.debug("服务器响应:{} ",res);
              if(false==pyRes.getSuccess())throw new RuntimeException("通知应用服务器失败,服务器响应"+res);
         } catch (IOException e) {
             e.printStackTrace();
@@ -91,17 +91,17 @@ public class ReptileServiceService extends CrudService<ReptileServiceDao, Reptil
 
     //更新配置信息
 
-   public void serviceConfig(ReptileService reptileService){
+   public void serviceConfig(String ip){
 
        Map map=new HashMap();
-       map.put("serviceIp",reptileService.getServiceIp());
-       map.put("proxy_ips",reptileService.getProxyServerIp());
-//       map.put("ftp_ip",reptileService.getFtpIp());
-//       map.put("ftp_port",reptileService.getFtpPort());
-//       map.put("ftp_uname",reptileService.getFtpUsername());
-//       map.put("ftp_upwd",reptileService.getFtpUpwd());
+       map.put("serviceIp",ip);
+       map.put("proxy_ips",null);
+       map.put("ftp_ip","113.204.4.244");
+       map.put("ftp_port","5718");
+       map.put("ftp_uname","ftp1");
+       map.put("ftp_upwd","synet123");
 
-       updateServerByZookeaper(reptileService.getServiceName(),"service_config",new Gson().toJson(map));
+       updateServerByZookeaper(ip,"service_config",new Gson().toJson(map));
    }
 
     public List<ReptileService> getServer() {
@@ -113,14 +113,10 @@ public class ReptileServiceService extends CrudService<ReptileServiceDao, Reptil
             listPath=zooKeeper.getChildren(ZookeeperSession.rootPath,null);//root
             for (String ss:listPath){
                 ReptileService rs=new ReptileService();
-                rs.setServiceIp(ss.substring(ss.lastIndexOf("_")+1,ss.length()));
+                rs.setServiceIp(ss);
                 rs.setServiceName(ss);
                 rsList.add(rs);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-            logger.error("",e);
-            throw  new RuntimeException("连接Zookeeper失败");
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("",e);

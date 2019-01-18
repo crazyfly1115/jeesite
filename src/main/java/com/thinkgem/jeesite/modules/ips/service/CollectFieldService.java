@@ -17,6 +17,7 @@ import com.thinkgem.jeesite.modules.ips.dao.CollectFieldDao;
  * @version 2019-01-03
  *  尚渝网络
  */
+@Deprecated
 @Service
 @Transactional(readOnly = true)
 public class CollectFieldService extends CrudService<CollectFieldDao, CollectField> {

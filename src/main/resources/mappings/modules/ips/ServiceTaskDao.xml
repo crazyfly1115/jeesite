@@ -4,7 +4,7 @@
     
 	<sql id="serviceTaskColumns">
 				a.id AS "id",
-				a.service_id AS "serviceId",
+				a.service_ip AS "serviceIp",
 				a.task_id AS "taskId",
 				a.create_by AS "createBy.id",
 				a.create_date AS "createDate",
@@ -32,9 +32,6 @@
 		<include refid="serviceTaskJoins"/>
 		<where>
 			a.del_flag = #{DEL_FLAG_NORMAL}
-			<if test="serviceId != null and serviceId != ''">
-				AND a.service_id = #{serviceId}
-			</if>
 			<if test="taskId != null and taskId != ''">
 				AND a.task_id = #{taskId}
 			</if>
@@ -70,7 +67,7 @@
 	<insert id="insert">
 		INSERT INTO tb_service_task(
 			id,
-			service_id,
+			service_ip,
 			task_id,
 			create_by,
 			create_date,
@@ -80,7 +77,7 @@
 			del_flag
 		) VALUES (
 			#{id},
-			#{serviceId},
+			#{serviceIp},
 			#{taskId},
 			#{createBy.id},
 			#{createDate},
@@ -93,7 +90,7 @@
 	
 	<update id="update">
 		UPDATE tb_service_task SET 	
-			service_id = #{serviceId},
+			service_ip = #{serviceIp},
 			task_id = #{taskId},
 			update_by = #{updateBy.id},
 			update_date = #{updateDate},

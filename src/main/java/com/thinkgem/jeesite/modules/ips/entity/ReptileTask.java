@@ -11,7 +11,7 @@ import com.thinkgem.jeesite.common.persistence.DataEntity;
 /**
  * 爬虫任务Entity
  * @author zhangsy
- * @version 2019-01-15
+ * @version 2019-01-18
  * 尚渝网络
  */
 public class ReptileTask extends DataEntity<ReptileTask> {
@@ -28,9 +28,11 @@ public class ReptileTask extends DataEntity<ReptileTask> {
 	private String poiType;		// 关键字
 	private Website websiteId;		// 网站
 	private Database databaseId;		// 数据库
+	private String tableName;		// 存储主表
 	private Crawler crawlerId;		// 爬虫
-	private StorageService storageServiceId;		// 存储服务
-	private List<ReptileService> serviceList;
+	private String storageServiceId;		// 存储服务
+
+	private List<ServiceTask> serviceList;
 	
 	public ReptileTask() {
 		super();
@@ -136,6 +138,15 @@ public class ReptileTask extends DataEntity<ReptileTask> {
 		this.databaseId = databaseId;
 	}
 	
+	@Length(min=0, max=200, message="存储主表长度必须介于 0 和 200 之间")
+	public String getTableName() {
+		return tableName;
+	}
+
+	public void setTableName(String tableName) {
+		this.tableName = tableName;
+	}
+	
 	public Crawler getCrawlerId() {
 		return crawlerId;
 	}
@@ -144,19 +155,20 @@ public class ReptileTask extends DataEntity<ReptileTask> {
 		this.crawlerId = crawlerId;
 	}
 	
-	public StorageService getStorageServiceId() {
+	@Length(min=0, max=64, message="存储服务长度必须介于 0 和 64 之间")
+	public String getStorageServiceId() {
 		return storageServiceId;
 	}
 
-	public void setStorageServiceId(StorageService storageServiceId) {
+	public void setStorageServiceId(String storageServiceId) {
 		this.storageServiceId = storageServiceId;
 	}
 
-	public List<ReptileService> getServiceList() {
+	public List<ServiceTask> getServiceList() {
 		return serviceList;
 	}
 
-	public void setServiceList(List<ReptileService> serviceList) {
+	public void setServiceList(List<ServiceTask> serviceList) {
 		this.serviceList = serviceList;
 	}
 }
