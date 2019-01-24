@@ -3,6 +3,7 @@
 <mapper namespace="com.thinkgem.jeesite.modules.ips.dao.DatabaseDao">
     
 	<sql id="databaseColumns">
+		a.is_default as "isDefault",
 		a.database_name AS "databaseName",
 		a.id AS "id",
 		a.database_url AS "databaseUrl",
@@ -66,6 +67,7 @@
 	
 	<insert id="insert">
 		INSERT INTO tb_database(
+			is_default,
 			database_name,
 			id,
 			database_url,
@@ -79,6 +81,7 @@
 			remarks,
 			del_flag
 		) VALUES (
+			#{isDefault},
 			#{databaseName},
 			#{id},
 			#{databaseUrl},
@@ -95,7 +98,8 @@
 	</insert>
 	
 	<update id="update">
-		UPDATE tb_database SET 	
+		UPDATE tb_database SET
+			is_default = #{isDefault},
 			database_name = #{databaseName},
 			database_url = #{databaseUrl},
 			database_port = #{databasePort},
@@ -112,5 +116,27 @@
 			del_flag = #{DEL_FLAG_DELETE}
 		WHERE id = #{id}
 	</update>
+
+	<update id="updateDefAll">
+		UPDATE tb_database SET
+			is_default = '0'
+		WHERE del_flag=#{DEL_FLAG_NORMAL} and is_default='1'
+	</update>
+
+	<select id="getDef" resultType="Database">
+		SELECT
+		<include refid="databaseColumns"/>
+		FROM tb_database a
+		<include refid="databaseJoins"/>
+		WHERE a.del_flag=#{DEL_FLAG_NORMAL} and a.is_default=1
+	</select>
+
+	<select id="findDef" resultType="Database">
+		SELECT
+		<include refid="databaseColumns"/>
+		FROM tb_database a
+		<include refid="databaseJoins"/>
+		WHERE a.del_flag=#{DEL_FLAG_NORMAL}
+	</select>
 	
 </mapper>

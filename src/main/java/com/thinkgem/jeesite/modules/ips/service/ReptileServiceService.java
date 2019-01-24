@@ -33,6 +33,32 @@ import com.thinkgem.jeesite.modules.ips.dao.ReptileServiceDao;
 @Transactional(readOnly = true)
 public class ReptileServiceService extends CrudService<ReptileServiceDao, ReptileService> {
 
+    /*private ReptileServiceService() {
+    }*/
+
+    private static class SingletonClassInstance {
+        private static ZooKeeper zooKeeper = null;
+
+        public static ZooKeeper getInstance() {
+            if(zooKeeper==null) {
+                synchronized (ZooKeeper.class) {
+                    if (zooKeeper == null) {
+                        try {
+                            zooKeeper = ZookeeperSession.getZooKeeper();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            //logger.error("",e);
+                            throw  new RuntimeException("连接Zookeeper失败");
+                        }
+                    }
+
+                }
+            }
+            return zooKeeper;
+        }
+
+    }
+
     /**
      * @Author zhangsy
      * @Description  ReptileServiceService /
@@ -48,7 +74,7 @@ public class ReptileServiceService extends CrudService<ReptileServiceDao, Reptil
 
             String partntRoot="";
             String URLPath="";
-           ZooKeeper zooKeeper= ZookeeperSession.getZooKeeper();
+           ZooKeeper zooKeeper= SingletonClassInstance.getInstance();
             List<String> listPath=new ArrayList<String>();
 //            listPath=zooKeeper.getChildren(ZookeeperSession.rootPath,null);//root
 //            for (String ss:listPath){
@@ -106,9 +132,9 @@ public class ReptileServiceService extends CrudService<ReptileServiceDao, Reptil
 
     public List<ReptileService> getServer() {
         List<ReptileService> rsList=new ArrayList<ReptileService>();
-        ZooKeeper zooKeeper= null;
+        ZooKeeper zooKeeper= SingletonClassInstance.getInstance();
         try {
-            zooKeeper = ZookeeperSession.getZooKeeper();
+            //zooKeeper = ZookeeperSession.getZooKeeper();
             List<String> listPath=new ArrayList<String>();
             listPath=zooKeeper.getChildren(ZookeeperSession.rootPath,null);//root
             for (String ss:listPath){

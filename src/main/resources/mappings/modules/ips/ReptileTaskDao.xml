@@ -24,6 +24,7 @@
 				a.update_date AS "updateDate",
 				a.remarks AS "remarks",
 				a.del_flag AS "delFlag",
+				a.task_type AS "taskType",
 				w11.website_name AS "websiteId.websiteName",
 				w12.database_name AS "databaseId.databaseName",
 				w14.crawler_name AS "crawlerId.crawlerName"
@@ -107,7 +108,8 @@
 			update_by,
 			update_date,
 			remarks,
-			del_flag
+			del_flag,
+			task_type
 		) VALUES (
 			#{id},
 			#{taskName},
@@ -129,7 +131,8 @@
 			#{updateBy.id},
 			#{updateDate},
 			#{remarks},
-			#{delFlag}
+			#{delFlag},
+			#{taskType}
 		)
 	</insert>
 	
@@ -152,7 +155,8 @@
 			update_by = #{updateBy.id},
 			update_date = #{updateDate},
 			remarks = #{remarks},
-			del_flag = #{delFlag}
+			del_flag = #{delFlag},
+			task_type = #{taskType}
 		WHERE id = #{id}
 	</update>
 	
@@ -161,6 +165,7 @@
 			del_flag = #{DEL_FLAG_DELETE}
 		WHERE id = #{id}
 	</update>
+
 	<select id="getTask" resultType="java.util.HashMap">
 
 			SELECT
@@ -186,4 +191,5 @@
 		WHERE t1.ID=#{id} AND t1.del_flag=0
 
 	</select>
+	
 </mapper>

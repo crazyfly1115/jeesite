@@ -18,6 +18,7 @@ public class Database extends DataEntity<Database> {
 	private String databasePort;		// 数据库端口号
 	private String loginUser;		// 登陆用户名
 	private String loginPsw;		// 登陆密码
+	private String isDefault;		//是否为默认数据库
 	
 	public Database() {
 		super();
@@ -70,6 +71,15 @@ public class Database extends DataEntity<Database> {
 
 	public void setLoginPsw(String loginPsw) {
 		this.loginPsw = loginPsw;
+	}
+
+	//isDefault
+	public String getIsDefault() {
+		return isDefault;
+	}
+
+	public void setIsDefault(String isDefault) {
+		this.isDefault = isDefault;
 	}
 	
 }

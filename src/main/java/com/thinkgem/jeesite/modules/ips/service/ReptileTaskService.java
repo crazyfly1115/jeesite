@@ -105,7 +105,7 @@ public class ReptileTaskService extends CrudService<ReptileTaskDao, ReptileTask>
         //
         for (ServiceTask serviceTask:reptileTask.getServiceList()){
             //todo  暂时将py 地址写死,等正式后将参数修改
-            map.put("python_file","/python/poi/v1/stcrawler.rar");
+            map.put("python_file","/python/poi/v1/stcrawler.zip");
             reptileService.updateServerByZookeaper(serviceTask.getServiceIp(),"task_add",new JsonMapper(JsonInclude.Include.ALWAYS).toJson(map));
 
         }
