@@ -68,14 +68,14 @@ public class StorageServiceController extends BaseController {
 	@RequiresPermissions("ips:storageService:view")
 	@RequestMapping(value = {"getListMsg"})
 	@ResponseBody
-	public List<Map<String,String>> getListMsg(StorageService storageService, HttpServletRequest request, HttpServletResponse response) {
+	public String getListMsg(StorageService storageService, HttpServletRequest request, HttpServletResponse response) {
         String name= null;
         try {
             name = new String(request.getParameter("zookeeperName").getBytes("iso8859-1"),"utf-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return storageServiceService.getZookeeperMsg(name);
+        return new Ret("data",storageServiceService.getZookeeperMsg(name)).toString();
 	}
 
 	@RequiresPermissions("ips:storageService:view")
