@@ -2,23 +2,25 @@ package com.thinkgem.jeesite.modules.ips.service;
 
 import java.io.IOException;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.logging.Logger;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.utils.AssertUtil;
 import com.thinkgem.jeesite.common.utils.Encoding;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.ips.entity.ReptileTask;
+import com.thinkgem.jeesite.modules.ips.entity.RootTask;
 import com.thinkgem.jeesite.modules.zookeeper.ClintUtil;
 import com.thinkgem.jeesite.modules.zookeeper.ZookeeperSession;
 import com.thinkgem.jeesite.modules.zookeeper.py.PyRes;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.data.Stat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,9 +41,18 @@ import com.thinkgem.jeesite.modules.ips.dao.StorageServiceDao;
 public class StorageServiceService extends CrudService<StorageServiceDao, StorageService> {
 
     private final static   String RootPath="/DATAINPUT";
+    private static Stat stat = new Stat();
 
     @Autowired
     private CrawlerService crawlerService;
+
+    public Date transferLongToDate(String dateFormat, String millSec) {
+
+        SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
+        long l=Long.parseLong(millSec);
+        Date date = new Date(l);
+        return date;
+     }
     /**
      * 获取zookeeper注册的服务节点
      * @param
@@ -49,7 +60,7 @@ public class StorageServiceService extends CrudService<StorageServiceDao, Storag
      */
     public List<StorageService> getListByZookeeper(){
         List<StorageService> list=new ArrayList<StorageService>();
-            ZooKeeper zooKeeper=ZookeeperSession.getZooKeeper();
+        ZooKeeper zooKeeper=ZookeeperSession.getZooKeeper();
         try {
             List<String> path=zooKeeper.getChildren(RootPath,false);
             C:for (String s:path){
@@ -72,6 +83,38 @@ public class StorageServiceService extends CrudService<StorageServiceDao, Storag
             logger.error("zookeeeper 异常",e);
             throw  new RuntimeException("zookeeper异常"+InterruptedException.class);
         }
+    }
+
+    /**
+     * 获取zookeeper注册的服务节点的详细信息
+     * @param
+     * @return
+     */
+    public List<Map<String,String>> getZookeeperMsg(String path){
+
+        ZooKeeper zooKeeper=ZookeeperSession.getZooKeeper();
+
+        byte[] rs= new byte[0];
+        path=RootPath+"/"+path;
+        try {
+            rs = zooKeeper.getData(path,null,stat);
+        } catch (KeeperException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        if(rs!=null){
+
+            String tx=new String(rs);
+            tx=tx.substring(tx.indexOf("["),tx.length());
+            Gson gson=new Gson();
+            List<Map<String,String>> listTask=new Gson().fromJson(tx, new TypeToken<List<Map<String, String>>>(){}.getType());
+            //[{"task_status":"ON","task_lastid":"10","task_begin_time":"1548239964982","task_id":"9b9d24e0b8fb4aefb9b9513cc9090472"}]
+            if(listTask!=null && listTask.size()>0){
+                return listTask;
+            }
+        }
+        return null;
     }
     /**
      * 通知存储服务器

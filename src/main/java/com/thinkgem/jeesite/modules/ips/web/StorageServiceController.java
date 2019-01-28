@@ -62,6 +62,14 @@ public class StorageServiceController extends BaseController {
 		return new Ret("data",storageServiceService.getListByZookeeper()).toString();
 	}
 	@RequiresPermissions("ips:storageService:view")
+	@RequestMapping(value = {"getListMsg"})
+	@ResponseBody
+	public String getListMsg(StorageService storageService, HttpServletRequest request, HttpServletResponse response) {
+		String name=request.getParameter("zookeeperName");
+		return new Ret("data",storageServiceService.getZookeeperMsg(name)).toString();
+	}
+
+	@RequiresPermissions("ips:storageService:view")
 	@RequestMapping(value = {"getById"})
 	@ResponseBody
 	public String getById(@RequestParam(required = true) String id) {

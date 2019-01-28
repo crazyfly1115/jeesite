@@ -27,6 +27,7 @@ public class RootTask extends DataEntity<RootTask> {
     private int retry_times;
     private String ftp_dir;
     private String service_name;
+    private String task_lastid;
     public void setTask_name(String task_name) {
         this.task_name = task_name;
     }
@@ -129,5 +130,13 @@ public class RootTask extends DataEntity<RootTask> {
 
     public boolean isTask_status() {
         return task_status;
+    }
+
+    public String getTask_lastid() {
+        return task_lastid;
+    }
+
+    public void setTask_lastid(String task_lastid) {
+        this.task_lastid = task_lastid;
     }
 }
