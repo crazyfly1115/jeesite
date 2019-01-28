@@ -32,6 +32,8 @@ public class ReptileTask extends DataEntity<ReptileTask> {
 	private Crawler crawlerId;		// 爬虫
 	private String storageServiceId;		// 存储服务
 	private String taskType;		// 任务类型
+	private String websiteUrl;//website_url 网站url
+	private String crawlerUrl;//crawler_url 爬虫url
 
 	private List<ServiceTask> serviceList;
 	
@@ -189,5 +191,23 @@ public class ReptileTask extends DataEntity<ReptileTask> {
 	public void setServiceList(List<ServiceTask> serviceList) {
 		this.serviceList = serviceList;
 	}
-	
+
+    @Length(min=0, max=10, message="任务类型长度必须介于 0 和 10 之间")
+    public String getCrawlerUrl() {
+        return crawlerUrl;
+    }
+
+    public void setCrawlerUrl(String crawlerUrl) {
+        this.crawlerUrl = crawlerUrl;
+    }
+
+    @Length(min=0, max=10, message="任务类型长度必须介于 0 和 10 之间")
+    public String getWebsiteUrl() {
+        return websiteUrl;
+    }
+
+    public void setWebsiteUrl(String websiteUrl) {
+        this.websiteUrl = websiteUrl;
+    }
+
 }
