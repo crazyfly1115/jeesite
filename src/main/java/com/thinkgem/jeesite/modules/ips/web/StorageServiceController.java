@@ -13,6 +13,10 @@ import com.thinkgem.jeesite.common.web.BaseController;
 import com.thinkgem.jeesite.modules.ips.entity.StorageService;
 import com.thinkgem.jeesite.modules.ips.service.StorageServiceService;
 
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+import java.util.Map;
+
 /**
  * 存储容器
  * @author zhangsy
@@ -64,9 +68,14 @@ public class StorageServiceController extends BaseController {
 	@RequiresPermissions("ips:storageService:view")
 	@RequestMapping(value = {"getListMsg"})
 	@ResponseBody
-	public String getListMsg(StorageService storageService, HttpServletRequest request, HttpServletResponse response) {
-		String name=request.getParameter("zookeeperName");
-		return new Ret("data",storageServiceService.getZookeeperMsg(name)).toString();
+	public List<Map<String,String>> getListMsg(StorageService storageService, HttpServletRequest request, HttpServletResponse response) {
+        String name= null;
+        try {
+            name = new String(request.getParameter("zookeeperName").getBytes("iso8859-1"),"utf-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return storageServiceService.getZookeeperMsg(name);
 	}
 
 	@RequiresPermissions("ips:storageService:view")

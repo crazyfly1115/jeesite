@@ -93,7 +93,7 @@ public class StorageServiceService extends CrudService<StorageServiceDao, Storag
     public List<Map<String,String>> getZookeeperMsg(String path){
 
         ZooKeeper zooKeeper=ZookeeperSession.getZooKeeper();
-
+        List<Map<String,String>> listTask=new ArrayList<Map<String, String>>();
         byte[] rs= new byte[0];
         path=RootPath+"/"+path;
         try {
@@ -106,15 +106,18 @@ public class StorageServiceService extends CrudService<StorageServiceDao, Storag
         if(rs!=null){
 
             String tx=new String(rs);
-            tx=tx.substring(tx.indexOf("["),tx.length());
-            Gson gson=new Gson();
-            List<Map<String,String>> listTask=new Gson().fromJson(tx, new TypeToken<List<Map<String, String>>>(){}.getType());
-            //[{"task_status":"ON","task_lastid":"10","task_begin_time":"1548239964982","task_id":"9b9d24e0b8fb4aefb9b9513cc9090472"}]
-            if(listTask!=null && listTask.size()>0){
-                return listTask;
+            if (tx.indexOf("[")>-1){
+                tx=tx.substring(tx.indexOf("["),tx.length());
+                Gson gson=new Gson();
+                listTask=new Gson().fromJson(tx, new TypeToken<List<Map<String, String>>>(){}.getType());
+                //[{"task_status":"ON","task_lastid":"10","task_begin_time":"1548239964982","task_id":"9b9d24e0b8fb4aefb9b9513cc9090472"}]
+                if(listTask!=null && listTask.size()>0){
+                    return listTask;
+                }
             }
+
         }
-        return null;
+        return listTask;
     }
     /**
      * 通知存储服务器
