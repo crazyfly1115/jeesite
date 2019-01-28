@@ -42,7 +42,7 @@ public class ReptileServiceService extends CrudService<ReptileServiceDao, Reptil
         public static ZooKeeper getInstance() {
             if(zooKeeper==null) {
                 synchronized (ZooKeeper.class) {
-                    if (zooKeeper == null) {
+                    if (zooKeeper == null||!zooKeeper.getState().isConnected()) {
                         try {
                             zooKeeper = ZookeeperSession.getZooKeeper();
                         } catch (Exception e) {
@@ -99,7 +99,7 @@ public class ReptileServiceService extends CrudService<ReptileServiceDao, Reptil
              PyRes pyRes=new Gson().fromJson(res,PyRes.class);
              logger.debug("请求路径:{}请求内容:{}",URLDecoder.decode(URLPath,"utf-8"),data);
              logger.debug("服务器响应:{} ",res);
-             if(false==pyRes.getSuccess())throw new RuntimeException("通知应用服务器失败,服务器响应"+res);
+             if(pyRes==null||false==pyRes.getSuccess())throw new RuntimeException("通知应用服务器失败,服务器响应"+res);
         } catch (IOException e) {
             e.printStackTrace();
             logger.error("",e);

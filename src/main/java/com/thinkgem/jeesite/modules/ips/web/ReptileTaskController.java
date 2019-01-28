@@ -32,7 +32,7 @@ public class ReptileTaskController extends BaseController {
 	@ResponseBody
 	public String save(@RequestParam(required = true) String json) {
 
-		 ReptileTask reptileTask=gson.fromJson(json, ReptileTask.class);
+		ReptileTask reptileTask=gson.fromJson(json, ReptileTask.class);
 
 		beanValidator(reptileTask);
 	

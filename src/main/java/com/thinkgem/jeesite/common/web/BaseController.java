@@ -223,7 +223,7 @@ public abstract class BaseController {
 	@ResponseBody
 	public String ConstraintViolationException(ConstraintViolationException e){
 		List<String> list = BeanValidators.extractPropertyAndMessageAsList(e, ": ");
-		return new Ret(1,"数据验证失败："+list.toArray(new String[]{})).toString();
+		return new Ret(1,"数据验证失败："+gson.toJson(list)).toString();
 	}
 	
 	/**

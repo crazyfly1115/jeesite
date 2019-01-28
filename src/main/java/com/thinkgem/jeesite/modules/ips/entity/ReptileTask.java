@@ -192,7 +192,6 @@ public class ReptileTask extends DataEntity<ReptileTask> {
 		this.serviceList = serviceList;
 	}
 
-    @Length(min=0, max=10, message="任务类型长度必须介于 0 和 10 之间")
     public String getCrawlerUrl() {
         return crawlerUrl;
     }
@@ -201,7 +200,6 @@ public class ReptileTask extends DataEntity<ReptileTask> {
         this.crawlerUrl = crawlerUrl;
     }
 
-    @Length(min=0, max=10, message="任务类型长度必须介于 0 和 10 之间")
     public String getWebsiteUrl() {
         return websiteUrl;
     }

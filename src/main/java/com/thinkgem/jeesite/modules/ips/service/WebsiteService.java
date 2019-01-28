@@ -5,11 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.MalformedJsonException;
 import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.utils.AssertUtil;
 import com.thinkgem.jeesite.common.utils.StringUtils;
@@ -32,8 +30,8 @@ import com.thinkgem.jeesite.modules.ips.dao.WebsiteDao;
 @Transactional(readOnly = true)
 public class WebsiteService extends CrudService<WebsiteDao, Website> {
 
-    private  static  final  String BDPOI="BDPOI";
-    private  static final String GDPOI="GDPOI";
+    public   static  final  String BDPOI="BDPOI";
+    public  static final String GDPOI="GDPOI";
     //根据模板类型  分类数据
     public List getTypelist(String id) {
 
@@ -65,11 +63,14 @@ public class WebsiteService extends CrudService<WebsiteDao, Website> {
      *获取类型
      **/
     public String ParserJsonToType(String json){
-        try{
+        try {
             JsonParser parser = new JsonParser();
-            JsonElement jsonElement=parser.parse(json);
-            return jsonElement.getAsJsonObject().get("type").getAsString();
-        }catch (RuntimeException e){
+            JsonElement jsonElement = parser.parse(json);
+            return jsonElement.getAsJsonObject().get("task_type").getAsString();
+        }catch (JsonSyntaxException e){
+            e.printStackTrace();
+            throw  new RuntimeException("解析爬虫文件出错,请检查爬虫文件");
+        } catch (RuntimeException e){
             throw  e;
         }catch (Exception e){
             logger.error("解析策略文件错误",e);

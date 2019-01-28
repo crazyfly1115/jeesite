@@ -59,7 +59,7 @@ public class ZookeeperSession  implements Watcher {
         AssertUtil.notNull(ZookeeperAdder);
         try {
             if(zooKeeper!=null&&zooKeeper.getState().isConnected())return  zooKeeper;
-            zooKeeper = new ZooKeeper(ZookeeperAdder,5000, new ZookeeperSession());
+            zooKeeper = new ZooKeeper(ZookeeperAdder,500000000, new ZookeeperSession());
         } catch (IOException e) {
             e.printStackTrace();
             throw  new RuntimeException("连接zookeeper失败,无法获取容器数据");

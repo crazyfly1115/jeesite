@@ -1,16 +1,17 @@
 package com.thinkgem.jeesite.modules.ips.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.mapper.JsonMapper;
-import com.thinkgem.jeesite.common.utils.AssertUtil;
-import com.thinkgem.jeesite.common.utils.Encoding;
-import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.common.utils.*;
 import com.thinkgem.jeesite.modules.ips.entity.*;
 import org.activiti.engine.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,9 +61,10 @@ public class ReptileTaskService extends CrudService<ReptileTaskDao, ReptileTask>
         Crawler crawler=crawlerService.get(entity.getCrawlerId().getId());
 
 
+        String json=StringUtils.readToString(Global.getUserfilesBaseDir()+crawler.getCrawlerUrl());
+
         Database database=databaseService.get(entity.getDatabaseId().getId());
         if(duridService.existTable(database,entity.getTableName())){
-            String json=StringUtils.readToString(Global.getUserfilesBaseDir()+crawler.getCrawlerUrl());
             logger.debug("cw:文件内容{}",json);
 
             List<String> sqls=crawlerService.ParserJsonToSql(json,entity.getTableName(),true);
@@ -73,7 +75,10 @@ public class ReptileTaskService extends CrudService<ReptileTaskDao, ReptileTask>
             }
         }
 
+        //替换cw 文件中的关键字
+        //并生成文件
 
+        overidCw(entity,entity.getPoiType());
 
         super.save(entity);
         serviceTaskService.deleteByTaskId(entity.getId());
@@ -142,5 +147,46 @@ public class ReptileTaskService extends CrudService<ReptileTaskDao, ReptileTask>
         Map map=dao.getTask(id);
         map.put("task_file",Global.getUserfilesWebUrl()+map.get("task_file"));
         return map;
+    }
+    /**
+     *
+     * 覆盖cw 文件中的分类
+     **/
+    private void overidCw(ReptileTask reptileTask,String keyword){
+        String[] keys=StringUtils.split(keyword,",");
+        JsonArray ar=new JsonArray();
+        for (String key:keys){
+            ar.add(key);
+        }
+        JsonParser parser = new JsonParser();
+        JsonElement jsonElement=parser.parse(StringUtils.readToString(Global.getUserfilesBaseDir()+reptileTask.getCrawlerId().getCrawlerUrl()));
+        String type= jsonElement.getAsJsonObject().get("task_type").getAsString();
+
+
+        String webUrl=jsonElement.getAsJsonObject().get("inlet").getAsString();
+
+        AssertUtil.notNull(type,"cw文件中没有找到task_type");
+        AssertUtil.notNull(webUrl,"cw文件中没有找到网站url");
+        reptileTask.setWebsiteUrl(webUrl);
+
+        if(WebsiteService.GDPOI.equals(type)||WebsiteService.BDPOI.equals(type)){
+            jsonElement.getAsJsonObject().get("poi_kword").getAsJsonArray().addAll(ar);
+
+            //将上传文件保存到一个目标文件当中
+            Calendar date = Calendar.getInstance();
+            String newfileName=DateUtils.getDate("yyyyMMddHHmmssSSS")+".cw";
+            String newpath=date.get(Calendar.YEAR) + File.separator + (date.get(Calendar.MONTH)+1) + File.separator+ date.get(Calendar.DAY_OF_MONTH)+File.separator;
+            File newfile=new File(Global.getUserfilesBaseDir() + File.separator +newpath);
+            if(!newfile.exists()){
+                newfile.mkdirs();
+            }
+            String path=Global.getUserfilesBaseDir() + File.separator +newpath+ newfileName;
+            FileUtils.writeToFile(path,new Gson().toJson(jsonElement),false);
+            reptileTask.setCrawlerUrl(newpath.replaceAll("\\\\","/")+ newfileName);
+        }else{
+            reptileTask.setCrawlerUrl(reptileTask.getCrawlerId().getCrawlerUrl());
+        }
+
+
     }
 }
