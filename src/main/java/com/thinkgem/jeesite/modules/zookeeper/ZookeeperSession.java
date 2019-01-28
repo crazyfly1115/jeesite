@@ -58,6 +58,7 @@ public class ZookeeperSession  implements Watcher {
     public static ZooKeeper getZooKeeper() {
         AssertUtil.notNull(ZookeeperAdder);
         try {
+            if(zooKeeper!=null&&zooKeeper.getState().isConnected())return  zooKeeper;
             zooKeeper = new ZooKeeper(ZookeeperAdder,500, new ZookeeperSession());
         } catch (IOException e) {
             e.printStackTrace();

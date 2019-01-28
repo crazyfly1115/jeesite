@@ -137,5 +137,10 @@
 			del_flag = #{DEL_FLAG_DELETE}
 		WHERE id = #{id}
 	</update>
+
+	<select id="getType" resultType="java.util.HashMap">
+		select  big_category as bigCategory , mid_category as midCategory FROM tb_poi_kword where kword_type=#{type}
+
+	</select>
 	
 </mapper>

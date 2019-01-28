@@ -13,6 +13,8 @@ import com.thinkgem.jeesite.common.web.BaseController;
 import com.thinkgem.jeesite.modules.ips.entity.Website;
 import com.thinkgem.jeesite.modules.ips.service.WebsiteService;
 
+import java.util.List;
+
 /**
  * 网站数据Controller
  * @author zhangsy
@@ -82,4 +84,27 @@ public class WebsiteController extends BaseController {
 	public String config(){
 		return new Ret("data",super.getDataBaseConfig(dataBaseId)).toString();
 	}
+
+	/**
+	 * 根据模板id 给出网站分类
+	 *
+	 **/
+	@RequiresPermissions("ips:website:view")
+	@RequestMapping(value = {"getTypeList"})
+	@ResponseBody
+	public String getTypeList(String id){
+
+		List list=websiteService.getTypelist(id);
+		return new Ret().putData(list).toString();
+
+	}
+	@RequiresPermissions("ips:website:view")
+	@RequestMapping(value = {"getType"})
+	@ResponseBody
+	public String getType(String id){
+
+		return new Ret().putData(websiteService.getType(id)).toString();
+
+	}
+
 }

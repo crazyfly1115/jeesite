@@ -4,6 +4,8 @@ import com.thinkgem.jeesite.common.persistence.CrudDao;
 import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
 import com.thinkgem.jeesite.modules.ips.entity.Website;
 
+import java.util.List;
+
 /**
  * 网站数据DAO接口
  * @author zhangsy
@@ -12,5 +14,7 @@ import com.thinkgem.jeesite.modules.ips.entity.Website;
  */
 @MyBatisDao
 public interface WebsiteDao extends CrudDao<Website> {
+
+    List getType(String type);
 	
 }
