@@ -17,6 +17,8 @@ public class Website extends DataEntity<Website> {
 	private String websiteUrl;		// 网站URL
 	private String websiteType;		// 网站类型
 	private String websiteToken;		// token
+	private Crawler crawlerId;		// 爬虫容器
+	private PythonPkg pythonPkgId;		//执行包
 	
 	public Website() {
 		super();
@@ -52,14 +54,22 @@ public class Website extends DataEntity<Website> {
 	public void setWebsiteType(String websiteType) {
 		this.websiteType = websiteType;
 	}
-	
-	@Length(min=0, max=100, message="token长度必须介于 0 和 100 之间")
-	public String getWebsiteToken() {
-		return websiteToken;
+
+	public Crawler getCrawlerId() {
+		return crawlerId;
 	}
 
-	public void setWebsiteToken(String websiteToken) {
-		this.websiteToken = websiteToken;
+	public void setCrawlerId(Crawler crawlerId) {
+		this.crawlerId = crawlerId;
 	}
-	
+
+
+	public PythonPkg getPythonPkgId() {
+		return pythonPkgId;
+	}
+
+	public void setPythonPkgId(PythonPkg pythonPkgId) {
+		this.pythonPkgId = pythonPkgId;
+	}
+
 }

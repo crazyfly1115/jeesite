@@ -24,6 +24,7 @@ public class Dict extends DataEntity<Dict> {
 	private String description;// 描述
 	private Integer sort;	// 排序
 	private String parentId;//父Id
+	private String isYw;//是否为业务数据
 
 	public Dict() {
 		super();
@@ -98,5 +99,14 @@ public class Dict extends DataEntity<Dict> {
 	@Override
 	public String toString() {
 		return label;
+	}
+
+	@Length(min=1, max=100)
+	public String getIsYw() {
+		return isYw;
+	}
+
+	public void setIsYw(String isYw) {
+		this.isYw = isYw;
 	}
 }

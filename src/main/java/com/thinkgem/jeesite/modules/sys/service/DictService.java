@@ -4,6 +4,7 @@
 package com.thinkgem.jeesite.modules.sys.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,13 +25,20 @@ import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 public class DictService extends CrudService<DictDao, Dict> {
 	
 	/**
-	 * 查询字段类型列表
+	 * 查询是否为业务字段类型列表
 	 * @return
 	 */
-	public List<String> findTypeList(){
-		return dao.findTypeList(new Dict());
+	public List<String> findTypeList(String isYw){
+		Dict dict=new Dict();
+		dict.setIsYw(isYw);
+		return dao.findTypeList(dict);
 	}
 
+	public List<Map<String ,String>> findTypeMap(String isYw){
+		Dict dict=new Dict();
+		dict.setIsYw(isYw);
+		return dao.findTypeMap(dict);
+	}
 	@Transactional(readOnly = false)
 	public void save(Dict dict) {
 		super.save(dict);

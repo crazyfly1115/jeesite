@@ -2,6 +2,7 @@ package com.thinkgem.jeesite.modules.ips.web;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.crypto.Data;
 
 import com.google.gson.reflect.TypeToken;
 import com.thinkgem.jeesite.common.bean.Ret;
@@ -195,6 +196,19 @@ public class DatabaseController extends BaseController {
 		List<SerachColumn> sclist=gson.fromJson(json,new TypeToken<List<SerachColumn>>(){}.getType());
 		SerachBean serachBean=new SerachBean(tableName,sclist);
 		return new Ret().putMap("data",duridService.getTableData(database,serachBean,new Page<Map>(request, response))).toString();
+
+	}
+
+	@RequiresPermissions("ips:database:view")
+	@RequestMapping(value = {"getDefData"})
+	@ResponseBody
+	public  String getDefData(HttpServletRequest request, HttpServletResponse response){
+		Database database= databaseService.findDef();
+		if(database==null){
+			return null;
+		}
+
+		return new Ret().putMap("data",database).toString();
 
 	}
 }

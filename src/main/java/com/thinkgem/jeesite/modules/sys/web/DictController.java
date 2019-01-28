@@ -48,9 +48,34 @@ public class DictController extends BaseController {
 	@RequestMapping(value = {"list"})
 	@ResponseBody
 	public String list(Dict dict, HttpServletRequest request, HttpServletResponse response, Model model) {
-		List<String> typeList = dictService.findTypeList();
+		String isYw=request.getParameter("isYw");
+		/*if(StringUtils.isBlank(isYw)){
+			isYw="";
+		}*/
+		List<String> typeList = dictService.findTypeList(isYw);
         Page<Dict> page = dictService.findPage(new Page<Dict>(request, response), dict);
 		return  new Ret().putMap("data",page).putMap("typeList",typeList).toString();
+	}
+	/*
+	 * @Author zhangsy
+	 * @Description  DictController
+	 * @Date 15:13 2019/1/27
+	 * @Param [dict, request, response, model]
+	 * @return java.lang.String
+	 * @Company 重庆尚渝网络科技
+	 * @version v1000
+	 * 查找字典类型
+	 **/
+	@RequiresPermissions("sys:dict:view")
+	@RequestMapping(value = {"findTypeList"})
+	@ResponseBody
+	public String findTypeList(String isYw) {
+		List<Map<String ,String>> typeList = dictService.findTypeMap(isYw);
+		//Page<Dict> page = dictService.findPage(new Page<Dict>(request, response), dict);
+		if(typeList.size()==0 ||typeList==null){
+			return null;
+		}
+		return  new Ret("data",typeList).toString();
 	}
 
 

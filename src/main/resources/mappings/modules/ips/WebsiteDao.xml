@@ -13,10 +13,16 @@
 				a.update_by AS "updateBy.id",
 				a.update_date AS "updateDate",
 				a.remarks AS "remarks",
-				a.del_flag AS "delFlag"
+				a.crawler_id AS "crawlerId.id",
+				a.python_pkg_id AS "pythonPkgId.id",
+				a.del_flag AS "delFlag",
+					w12.python_name AS "pythonPkgId.pythonName",
+					w14.crawler_name AS "crawlerId.crawlerName"
 	</sql>
 	
 	<sql id="websiteJoins">
+	   LEFT JOIN tb_python_pkg w12 ON w12.id= a.python_pkg_id
+	   LEFT JOIN tb_crawler w14 ON w14.id= a.crawler_id
 	</sql>
     
 	<select id="get" resultType="Website">
@@ -80,6 +86,8 @@
 	
 	<insert id="insert">
 		INSERT INTO tb_website(
+			crawler_id ,
+			python_pkg_id ,
 			id,
 			website_name,
 			website_url,
@@ -92,6 +100,8 @@
 			remarks,
 			del_flag
 		) VALUES (
+			#{crawlerId.id},
+			#{pythonPkgId.id},
 			#{id},
 			#{websiteName},
 			#{websiteUrl},
@@ -107,7 +117,9 @@
 	</insert>
 	
 	<update id="update">
-		UPDATE tb_website SET 	
+		UPDATE tb_website SET
+			crawler_id = #{crawlerId.id},
+			python_pkg_id = #{pythonPkgId.id},
 			website_name = #{websiteName},
 			website_url = #{websiteUrl},
 			website_type = #{websiteType},

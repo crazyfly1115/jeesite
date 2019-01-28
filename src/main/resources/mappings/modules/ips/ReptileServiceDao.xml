@@ -122,7 +122,7 @@
 	</insert>
 	
 	<update id="update">
-		UPDATE tb_service SET 	
+		UPDATE tb_service SET
 			service_name = #{serviceName},
 			service_ip = #{serviceIp},
 			service_port = #{servicePort},

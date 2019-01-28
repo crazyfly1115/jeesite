@@ -52,7 +52,12 @@ public class StorageServiceService extends CrudService<StorageServiceDao, Storag
             ZooKeeper zooKeeper=ZookeeperSession.getZooKeeper();
         try {
             List<String> path=zooKeeper.getChildren(RootPath,false);
-            for (String s:path){
+            C:for (String s:path){
+                //没有子节点的暂时隐藏
+                List<String> childPath= zooKeeper.getChildren(RootPath+"/"+s,false);
+                if(childPath==null||childPath.size()==0){
+                    continue C;
+                }
                 StorageService storageService=new StorageService();
                 storageService.setServiceIp(s);
                 list.add(storageService);

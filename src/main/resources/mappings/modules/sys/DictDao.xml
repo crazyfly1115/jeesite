@@ -17,6 +17,9 @@
 		<if test="type != null and type != ''">
 			AND type = #{type}
 		</if>
+		<if test="isYw != null and isYw != ''">
+			and is_yw=#{isYw}
+		</if>
 		<if test="description != null and description != ''">
 			AND description LIKE 
 					<if test="dbName == 'oracle'">'%'||#{description}||'%'</if>
@@ -33,19 +36,35 @@
 		WHERE del_flag = #{DEL_FLAG_NORMAL} 
 		ORDER BY type, sort, update_date DESC
 	</select>
-	
+
 	<select id="findTypeList" resultType="string">
-		SELECT 
-			type 
-		FROM sys_dict 
-		WHERE del_flag = #{DEL_FLAG_NORMAL} 
+		SELECT
+		type
+		FROM sys_dict
+		WHERE del_flag = #{DEL_FLAG_NORMAL}
+		<if test="isYw != null and isYw != ''">
+			and is_yw=#{isYw}
+		</if>
 		GROUP BY type
 		ORDER BY type
+	</select>
+
+	<select id="findTypeMap" resultType="Map">
+		SELECT
+		type,description
+		FROM sys_dict
+		WHERE del_flag = #{DEL_FLAG_NORMAL}
+		<if test="isYw != null and isYw != ''">
+			and is_yw=#{isYw}
+		</if>
+		GROUP BY type,description
+		ORDER BY type,description
 	</select>
 	
 	<insert id="insert">
 		INSERT INTO sys_dict(
-			id, 
+			is_yw,
+			id,
 			value, 
 			label, 
 			type, 
@@ -58,6 +77,7 @@
 			remarks, 
 			del_flag
 		) VALUES (
+			#{isYw},
 			#{id}, 
 			#{value}, 
 			#{label}, 
@@ -74,7 +94,8 @@
 	</insert>
 	
 	<update id="update">
-		UPDATE sys_dict SET 
+		UPDATE sys_dict SET
+			is_yw=#{isYw},
 			value = #{value}, 
 			label = #{label}, 
 			type = #{type}, 
