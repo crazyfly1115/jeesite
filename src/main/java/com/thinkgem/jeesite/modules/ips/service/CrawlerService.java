@@ -67,6 +67,7 @@ public class CrawlerService extends CrudService<CrawlerDao, Crawler> {
         }
         sql+="	id varchar(64) NOT NULL DEFAULT '',\n" +
                 "  grab_time datetime DEFAULT NULL,\n" +
+                "  version int DEFAULT 0,\n" +
                 "  fk_id varchar(64)  DEFAULT NULL,\n" +
                 "  create_by varchar(64) NOT NULL DEFAULT '1' COMMENT '创建者',\n" +
                 "  create_date datetime NOT NULL COMMENT '创建时间',\n" +
@@ -77,8 +78,31 @@ public class CrawlerService extends CrudService<CrawlerDao, Crawler> {
                 "  PRIMARY KEY (id)\n" +
                 ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='业务数据'";
         sqls.add(sql);
+
+        //添加日志表
+        sql="CREATE TABLE "+table+"_log (";
+        for (Subitem subitem:subitemList){
+            checkKeyWord(subitem.getName());
+            sql=sql+subitem.getName()+" varchar(255) DEFAULT NULL COMMENT '"+subitem.getField_des()+"',";
+        }
+        sql+="	id varchar(64) NOT NULL DEFAULT '',\n" +
+                "  log_id varchar(64) NOT NULL DEFAULT '',\n" +
+                "  grab_time datetime DEFAULT NULL,\n" +
+                "  fk_id varchar(64)  DEFAULT NULL,\n" +
+                "  create_by varchar(64) NOT NULL DEFAULT '1' COMMENT '创建者',\n" +
+                "  create_date datetime NOT NULL COMMENT '创建时间',\n" +
+                "  update_by varchar(64) NOT NULL COMMENT '更新者',\n" +
+                "  update_date datetime NOT NULL COMMENT '更新时间',\n" +
+                "  remarks varchar(255) DEFAULT NULL COMMENT '备注信息',\n" +
+                "  del_flag char(1) NOT NULL DEFAULT '0' COMMENT '删除标记',\n" +
+                "  PRIMARY KEY (id)\n" +
+                ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='业务数据日志表'";
+        sqls.add(sql);
+
+
         for (Subitem subitem:subitemList){
             if (subitem.getSubitem() != null) {
+                if("log".equals(subitem.getName()))throw  new RuntimeException("log为表关键字,配置文件中不能有以log为key的name");
                 getSQL(subitem.getSubitem(),table+=("_"+subitem.getName()),isDrop,sqls);
             }
         }

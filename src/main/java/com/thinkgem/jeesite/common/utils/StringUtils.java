@@ -410,15 +410,16 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 			in.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
+			throw new RuntimeException(e.getMessage());
 		} catch (IOException e) {
 			e.printStackTrace();
+			throw  new RuntimeException("IOexception");
 		}
 		try {
 			return new String(filecontent, encoding);
 		} catch (UnsupportedEncodingException e) {
-			System.err.println("The OS does not support " + encoding);
 			e.printStackTrace();
-			return null;
+			throw  new RuntimeException("UnsupportedEncodingException");
 		}
 	}
 }

@@ -105,4 +105,16 @@ public class ReptileServiceController extends BaseController {
 	public String getServer() {
 		return new Ret().putData(reptileServiceService.getServer()).toString();
 	}
+
+	/**
+	 * @version v1000
+	 * 获取同步数据确认
+	 **/
+	@RequiresPermissions("ips:reptileService:view")
+	@RequestMapping(value = {"getConfig"})
+	@ResponseBody
+	public String getConfig(ReptileService reptileService, HttpServletRequest request, HttpServletResponse response) {
+
+		return new Ret("data",reptileServiceService.getConfig()).toString();
+	}
 }

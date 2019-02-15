@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.ips.dao.ServiceErrDao">
+    
+	<sql id="serviceErrColumns">
+				a.id AS "id",
+				a.task_id AS "taskId",
+				a.err_type AS "errType",
+				a.err AS "err",
+				a.create_by AS "createBy.id",
+				a.create_date AS "createDate",
+				a.update_by AS "updateBy.id",
+				a.update_date AS "updateDate",
+				a.remarks AS "remarks",
+				a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="serviceErrJoins">
+	</sql>
+    
+	<select id="get" resultType="ServiceErr">
+		SELECT 
+			<include refid="serviceErrColumns"/>
+		FROM tb_service_err a
+		<include refid="serviceErrJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ServiceErr">
+		SELECT 
+			<include refid="serviceErrColumns"/>
+		FROM tb_service_err a
+		<include refid="serviceErrJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="taskId != null and taskId != ''">
+				AND a.task_id = #{taskId}
+			</if>
+			<if test="errType != null and errType != ''">
+				AND a.err_type = #{errType}
+			</if>
+			<if test="err != null and err != ''">
+				AND a.err LIKE 
+					<if test="dbName == 'oracle'">'%'||#{err}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{err}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{err},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ServiceErr">
+		SELECT 
+			<include refid="serviceErrColumns"/>
+		FROM tb_service_err a
+		<include refid="serviceErrJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO tb_service_err(
+			id,
+			task_id,
+			err_type,
+			err,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{taskId},
+			#{errType},
+			#{err},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE tb_service_err SET 	
+			task_id = #{taskId},
+			err_type = #{errType},
+			err = #{err},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="deleteById">
+		UPDATE tb_service_err SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

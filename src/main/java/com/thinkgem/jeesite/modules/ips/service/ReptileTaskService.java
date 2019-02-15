@@ -61,7 +61,7 @@ public class ReptileTaskService extends CrudService<ReptileTaskDao, ReptileTask>
         Crawler crawler=crawlerService.get(entity.getCrawlerId().getId());
 
 
-        String json=StringUtils.readToString(Global.getUserfilesBaseDir()+crawler.getCrawlerUrl());
+        String json=crawler.getCrawlerJson();//StringUtils.readToString(Global.getUserfilesBaseDir()+crawler.getCrawlerUrl());
 
         Database database=databaseService.get(entity.getDatabaseId().getId());
         if(duridService.existTable(database,entity.getTableName())){
@@ -78,7 +78,9 @@ public class ReptileTaskService extends CrudService<ReptileTaskDao, ReptileTask>
         //替换cw 文件中的关键字
         //并生成文件
 
-        overidCw(entity,entity.getPoiType());
+//        overidCw(entity,entity.getPoiType());
+        //这里的任务虽然有爬虫Json的配置文件字段,但是并没有使用,最后看定论
+        //观点:cw文件修改后爬虫任务需要重新新增不
 
         super.save(entity);
         serviceTaskService.deleteByTaskId(entity.getId());
@@ -145,15 +147,16 @@ public class ReptileTaskService extends CrudService<ReptileTaskDao, ReptileTask>
 
     public  Map getTask(String id){
         Map map=dao.getTask(id);
-        map.put("task_file",Global.getUserfilesWebUrl()+map.get("task_file"));
+        map.put("task_config",overidCw(dao.get(id)));
         return map;
     }
     /**
      *
      * 覆盖cw 文件中的分类
+     * 暂时:
      **/
-    private void overidCw(ReptileTask reptileTask,String keyword){
-        String[] keys=StringUtils.split(keyword,",");
+    private String overidCw(ReptileTask reptileTask){
+        String[] keys=StringUtils.split(reptileTask.getPoiType(),",");
         JsonArray ar=new JsonArray();
         for (String key:keys){
             ar.add(key);
@@ -173,20 +176,20 @@ public class ReptileTaskService extends CrudService<ReptileTaskDao, ReptileTask>
             jsonElement.getAsJsonObject().get("poi_kword").getAsJsonArray().addAll(ar);
 
             //将上传文件保存到一个目标文件当中
-            Calendar date = Calendar.getInstance();
-            String newfileName=DateUtils.getDate("yyyyMMddHHmmssSSS")+".cw";
-            String newpath=date.get(Calendar.YEAR) + File.separator + (date.get(Calendar.MONTH)+1) + File.separator+ date.get(Calendar.DAY_OF_MONTH)+File.separator;
-            File newfile=new File(Global.getUserfilesBaseDir() + File.separator +newpath);
-            if(!newfile.exists()){
-                newfile.mkdirs();
-            }
-            String path=Global.getUserfilesBaseDir() + File.separator +newpath+ newfileName;
-            FileUtils.writeToFile(path,new Gson().toJson(jsonElement),false);
-            reptileTask.setCrawlerUrl(newpath.replaceAll("\\\\","/")+ newfileName);
+//            Calendar date = Calendar.getInstance();
+//            String newfileName=DateUtils.getDate("yyyyMMddHHmmssSSS")+".cw";
+//            String newpath=date.get(Calendar.YEAR) + File.separator + (date.get(Calendar.MONTH)+1) + File.separator+ date.get(Calendar.DAY_OF_MONTH)+File.separator;
+//            File newfile=new File(Global.getUserfilesBaseDir() + File.separator +newpath);
+//            if(!newfile.exists()){
+//                newfile.mkdirs();
+//            }
+//            String path=Global.getUserfilesBaseDir() + File.separator +newpath+ newfileName;
+//            FileUtils.writeToFile(path,new Gson().toJson(jsonElement),false);
+//            reptileTask.setCrawlerUrl(newpath.replaceAll("\\\\","/")+ newfileName);
         }else{
-            reptileTask.setCrawlerUrl(reptileTask.getCrawlerId().getCrawlerUrl());
+//            reptileTask.setCrawlerUrl(reptileTask.getCrawlerId().getCrawlerUrl());
         }
-
+        return new Gson().toJson(jsonElement);
 
     }
 }

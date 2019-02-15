@@ -7,6 +7,7 @@
 				a.crawler_name AS "crawlerName",
 				a.python_pkg_id AS "pythonPkgId.id",
 				a.is_default AS "isDefault",
+				a.crawler_json AS "crawlerJson",
 				a.crawler_url AS "crawlerUrl",
 				a.create_by AS "createBy.id",
 				a.create_date AS "createDate",
@@ -36,6 +37,12 @@
 		<include refid="crawlerJoins"/>
 		<where>
 			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="crawlerName != null and crawlerName != ''">
+				AND a.crawler_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{crawlerName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{crawlerName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{crawlerName},'%')</if>
+			</if>
 		</where>
 		<choose>
 			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
@@ -71,6 +78,7 @@
 			crawler_name,
 			python_pkg_id,
 			is_default,
+			crawler_json,
 			crawler_url,
 			create_by,
 			create_date,
@@ -83,6 +91,7 @@
 			#{crawlerName},
 			#{pythonPkgId.id},
 			#{isDefault},
+			#{crawlerJson},
 			#{crawlerUrl},
 			#{createBy.id},
 			#{createDate},
@@ -98,6 +107,7 @@
 			crawler_name = #{crawlerName},
 			python_pkg_id = #{pythonPkgId.id},
 			is_default = #{isDefault},
+			crawler_json = #{crawlerJson},
 			crawler_url = #{crawlerUrl},
 			update_by = #{updateBy.id},
 			update_date = #{updateDate},

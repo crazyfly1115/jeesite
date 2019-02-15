@@ -10,6 +10,8 @@ import java.util.Map;
 import com.google.gson.Gson;
 import com.thinkgem.jeesite.common.utils.AssertUtil;
 import com.thinkgem.jeesite.common.utils.Encoding;
+import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import com.thinkgem.jeesite.modules.zookeeper.ClintUtil;
 import com.thinkgem.jeesite.modules.zookeeper.ZookeeperSession;
 import com.thinkgem.jeesite.modules.zookeeper.py.PyRes;
@@ -22,6 +24,8 @@ import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.modules.ips.entity.ReptileService;
 import com.thinkgem.jeesite.modules.ips.dao.ReptileServiceDao;
+
+import static com.thinkgem.jeesite.modules.sys.utils.DictUtils.getDictList;
 
 /**
  * 爬虫容器
@@ -120,17 +124,21 @@ public class ReptileServiceService extends CrudService<ReptileServiceDao, Reptil
 
    public void serviceConfig(String ip){
 
-       Map map=new HashMap();
+       Map map=getConfig();
        map.put("serviceIp",ip);
-       map.put("proxy_ips",null);
-       map.put("ftp_ip","113.204.4.244");
-       map.put("ftp_port","5718");
-       map.put("ftp_uname","ftp1");
-       map.put("ftp_upwd","synet123");
-
        updateServerByZookeaper(ip,"service_config",new Gson().toJson(map));
    }
-
+   public Map getConfig(){
+       Map map=new HashMap();
+       List dlIp=DictUtils.getDictList("dl_ip");
+       String dlip = StringUtils.join(dlIp.toArray(), ",");
+       map.put("proxy_ips",dlip);
+       map.put("ftp_ip",DictUtils.getDictLabel("ftp_ip","ftp","业务字典中未找到ftp_ip"));
+       map.put("ftp_port",DictUtils.getDictLabel("ftp_port","ftp","业务字典中未找到ftp_port"));
+       map.put("ftp_uname",DictUtils.getDictLabel("ftp_uname","ftp","业务字典中未找到ftp_uname"));
+       map.put("ftp_upwd",DictUtils.getDictLabel("ftp_upwd","ftp","业务字典中未找到ftp_upwd"));
+       return map;
+   }
     public List<ReptileService> getServer() {
         List<ReptileService> rsList=new ArrayList<ReptileService>();
         ZooKeeper zooKeeper= SingletonClassInstance.getInstance();
@@ -142,6 +150,9 @@ public class ReptileServiceService extends CrudService<ReptileServiceDao, Reptil
                 ReptileService rs=new ReptileService();
                 rs.setServiceIp(ss);
                 rs.setServiceName(ss);
+                List<String> child=zooKeeper.getChildren(ZookeeperSession.rootPath+"/"+ss+"/restapi",null);
+                rs.setServiceState("失去连接");
+                if(child==null||child.size()==0)rs.setServiceState("注册成功");
                 rsList.add(rs);
             }
         } catch (Exception e) {

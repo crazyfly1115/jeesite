@@ -35,6 +35,7 @@ public class ReptileTask extends DataEntity<ReptileTask> {
 	private String websiteUrl;//website_url 网站url
 	private String crawlerUrl;//crawler_url 爬虫url
 
+	private String crawlerJson;//任务内容
 	private List<ServiceTask> serviceList;
 	
 	public ReptileTask() {
@@ -208,4 +209,11 @@ public class ReptileTask extends DataEntity<ReptileTask> {
         this.websiteUrl = websiteUrl;
     }
 
+	public String getCrawlerJson() {
+		return crawlerJson;
+	}
+
+	public void setCrawlerJson(String crawlerJson) {
+		this.crawlerJson = crawlerJson;
+	}
 }
