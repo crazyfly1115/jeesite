@@ -1,5 +1,6 @@
 package com.thinkgem.jeesite.modules.ips.entity;
 
+import com.google.gson.JsonElement;
 import org.hibernate.validator.constraints.Length;
 import java.util.Date;
 import java.util.List;

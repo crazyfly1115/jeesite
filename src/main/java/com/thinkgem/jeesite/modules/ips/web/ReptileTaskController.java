@@ -99,7 +99,6 @@ public class ReptileTaskController extends BaseController {
 	public String updateTask(@RequestParam(required = true)String id){
 		ReptileTask reptileTask=reptileTaskService.get(id);
 		AssertUtil.notNull(reptileTask,"未查询到相关数据");
-		//TO-DO 操作zookeeper的相关数据
 		reptileTaskService.startTask(reptileTask);
 		return new Ret(0,"更新成功").toString();
 	}
@@ -109,8 +108,17 @@ public class ReptileTaskController extends BaseController {
 	public String changeState(@RequestParam(required = true)String id,@RequestParam(required = true)String state){
 		ReptileTask reptileTask=reptileTaskService.get(id);
 		AssertUtil.notNull(reptileTask,"未查询到相关数据");
-		//TO-DO 操作zookeeper的相关数据
 		reptileTaskService.changeState(reptileTask,Integer.parseInt(state));
 		return new Ret(0,"更新成功").toString();
+	}
+	/**
+	 * @version v1000
+	 * 获取爬虫状态
+	 **/
+	@RequiresPermissions("ips:reptileTask:view")
+	@RequestMapping(value = {"getTaskState"})
+	@ResponseBody
+	public String getTaskState(@RequestParam(required = true)String id){
+		return new Ret(0,"获取成功").putData(reptileTaskService.getTaskState(id)).toString();
 	}
 }

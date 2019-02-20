@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.ServletContextEvent;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -59,8 +60,11 @@ public class MQService {
                 for (MessageExt messageExt : msgs) {
                     String topic = messageExt.getTopic();
                     String tag = messageExt.getTags();
+                    Long date=messageExt.getBornTimestamp();
+                    String host= messageExt.getBornHostString();
+
                     String msg = new String(messageExt.getBody());
-                    logger.debug("消费响应：msgId : " + messageExt.getMsgId() + ",  msgBody : " + msg + ", tag:" + tag + ", topic:" + topic);
+                    logger.debug("消费响应：msgId : " + messageExt.getMsgId() + ",  msgBody : " + msg + ", tag:" + tag + ", topic:" + topic+ ", date:" + date+ ", host:" + host);
                     try{
                         if(StringUtils.isNotBlank(msg)){
                            Map<String,String> map = new Gson().fromJson(msg, new TypeToken<Map<String, String>>() { }.getType());
@@ -68,8 +72,10 @@ public class MQService {
                             ServiceErr serviceErr=new ServiceErr();
 
                             serviceErr.setTaskId(map.get("task_id"));
-                            serviceErr.setErr(map.get("error_msg"));
+                            serviceErr.setErrMsg(map.get("error_msg"));
                             serviceErr.setErrType(map.get("error_type"));
+                            serviceErr.setBornTime(new Date(date));
+                            serviceErr.setHostIp(host);
                             serviceErr.setCreateBy(new User("1"));
                             serviceErr.setUpdateBy(new User("1"));
                             serviceErrService=SpringContextHolder.getBean(ServiceErrService.class);

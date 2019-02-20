@@ -6,8 +6,10 @@
 				a.id AS "id",
 				a.task_id AS "taskId",
 				a.err_type AS "errType",
-				a.err AS "err",
+				a.err_msg AS "errMsg",
+				a.born_time AS "bornTime",
 				a.create_by AS "createBy.id",
+				a.host_ip AS "hostIp",
 				a.create_date AS "createDate",
 				a.update_by AS "updateBy.id",
 				a.update_date AS "updateDate",
@@ -39,11 +41,17 @@
 			<if test="errType != null and errType != ''">
 				AND a.err_type = #{errType}
 			</if>
-			<if test="err != null and err != ''">
-				AND a.err LIKE 
-					<if test="dbName == 'oracle'">'%'||#{err}||'%'</if>
-					<if test="dbName == 'mssql'">'%'+#{err}+'%'</if>
-					<if test="dbName == 'mysql'">concat('%',#{err},'%')</if>
+			<if test="errMsg != null and errMsg != ''">
+				AND a.err_msg LIKE 
+					<if test="dbName == 'oracle'">'%'||#{errMsg}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{errMsg}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{errMsg},'%')</if>
+			</if>
+			<if test="bornTime != null and bornTime != ''">
+				AND a.born_time = #{bornTime}
+			</if>
+			<if test="hostIp != null and hostIp != ''">
+				AND a.host_ip = #{hostIp}
 			</if>
 		</where>
 		<choose>
@@ -79,8 +87,10 @@
 			id,
 			task_id,
 			err_type,
-			err,
+			err_msg,
+			born_time,
 			create_by,
+			host_ip,
 			create_date,
 			update_by,
 			update_date,
@@ -90,8 +100,10 @@
 			#{id},
 			#{taskId},
 			#{errType},
-			#{err},
+			#{errMsg},
+			#{bornTime},
 			#{createBy.id},
+			#{hostIp},
 			#{createDate},
 			#{updateBy.id},
 			#{updateDate},
@@ -104,7 +116,9 @@
 		UPDATE tb_service_err SET 	
 			task_id = #{taskId},
 			err_type = #{errType},
-			err = #{err},
+			err_msg = #{errMsg},
+			born_time = #{bornTime},
+			host_ip = #{hostIp},
 			update_by = #{updateBy.id},
 			update_date = #{updateDate},
 			remarks = #{remarks}

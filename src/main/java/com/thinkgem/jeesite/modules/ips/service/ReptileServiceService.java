@@ -11,6 +11,7 @@ import com.google.gson.Gson;
 import com.thinkgem.jeesite.common.utils.AssertUtil;
 import com.thinkgem.jeesite.common.utils.Encoding;
 import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.modules.sys.entity.Dict;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import com.thinkgem.jeesite.modules.zookeeper.ClintUtil;
 import com.thinkgem.jeesite.modules.zookeeper.ZookeeperSession;
@@ -130,9 +131,12 @@ public class ReptileServiceService extends CrudService<ReptileServiceDao, Reptil
    }
    public Map getConfig(){
        Map map=new HashMap();
-       List dlIp=DictUtils.getDictList("dl_ip");
-       String dlip = StringUtils.join(dlIp.toArray(), ",");
-       map.put("proxy_ips",dlip);
+       List<Dict> dlIp=DictUtils.getDictList("dl_ip");
+       List<String> dllist=new ArrayList<String>();
+       for (Dict d:dlIp){
+           dllist.add(d.getLabel());
+       }
+       map.put("proxy_ips",dllist);
        map.put("ftp_ip",DictUtils.getDictLabel("ftp_ip","ftp","业务字典中未找到ftp_ip"));
        map.put("ftp_port",DictUtils.getDictLabel("ftp_port","ftp","业务字典中未找到ftp_port"));
        map.put("ftp_uname",DictUtils.getDictLabel("ftp_uname","ftp","业务字典中未找到ftp_uname"));
@@ -152,7 +156,11 @@ public class ReptileServiceService extends CrudService<ReptileServiceDao, Reptil
                 rs.setServiceName(ss);
                 List<String> child=zooKeeper.getChildren(ZookeeperSession.rootPath+"/"+ss+"/restapi",null);
                 rs.setServiceState("失去连接");
-                if(child==null||child.size()==0)rs.setServiceState("注册成功");
+                if(child==null||child.size()==0){
+
+                }else {
+                    rs.setServiceState("注册成功");
+                }
                 rsList.add(rs);
             }
         } catch (Exception e) {

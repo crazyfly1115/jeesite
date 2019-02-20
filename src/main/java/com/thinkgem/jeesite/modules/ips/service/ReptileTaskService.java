@@ -1,19 +1,16 @@
 package com.thinkgem.jeesite.modules.ips.service;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.mapper.JsonMapper;
 import com.thinkgem.jeesite.common.utils.*;
 import com.thinkgem.jeesite.modules.ips.entity.*;
-import org.activiti.engine.TaskService;
+import com.thinkgem.jeesite.modules.zookeeper.ZookeeperSession;
+import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.data.Stat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -111,9 +108,11 @@ public class ReptileTaskService extends CrudService<ReptileTaskDao, ReptileTask>
         if(reptileTask.getServiceList()==null||reptileTask.getServiceList().size()==0) throw new RuntimeException("该任务未指定爬虫服务");
         //
         for (ServiceTask serviceTask:reptileTask.getServiceList()){
-            //todo  暂时将py 地址写死,等正式后将参数修改
-            map.put("python_file","/python/poi/v1/stcrawler.zip");
-            reptileService.updateServerByZookeaper(serviceTask.getServiceIp(),"task_add",new JsonMapper(JsonInclude.Include.ALWAYS).toJson(map));
+            //  暂时将py 地址写死,等正式后将参数修改
+            map.put("python_file",Global.getUserfilesWebUrl()+map.get("python_file"));
+            reptileService.updateServerByZookeaper(serviceTask.getServiceIp(),"task_add",new GsonBuilder()
+                    .serializeNulls()
+                    .create().toJson(map));
 
         }
 
@@ -130,7 +129,9 @@ public class ReptileTaskService extends CrudService<ReptileTaskDao, ReptileTask>
 
 
 
-            reptileService.updateServerByZookeaper(serviceTask.getServiceIp(),"task_schedule",new JsonMapper(JsonInclude.Include.ALWAYS).toJson(rs));
+            reptileService.updateServerByZookeaper(serviceTask.getServiceIp(),"task_schedule",new GsonBuilder()
+                    .serializeNulls()
+                    .create().toJson(rs));
         }
     }
 
@@ -155,14 +156,14 @@ public class ReptileTaskService extends CrudService<ReptileTaskDao, ReptileTask>
      * 覆盖cw 文件中的分类
      * 暂时:
      **/
-    private String overidCw(ReptileTask reptileTask){
+    private JsonElement overidCw(ReptileTask reptileTask){
         String[] keys=StringUtils.split(reptileTask.getPoiType(),",");
         JsonArray ar=new JsonArray();
         for (String key:keys){
             ar.add(key);
         }
         JsonParser parser = new JsonParser();
-        JsonElement jsonElement=parser.parse(StringUtils.readToString(Global.getUserfilesBaseDir()+reptileTask.getCrawlerId().getCrawlerUrl()));
+        JsonElement jsonElement=parser.parse(reptileTask.getCrawlerId().getCrawlerJson());
         String type= jsonElement.getAsJsonObject().get("task_type").getAsString();
 
 
@@ -170,26 +171,52 @@ public class ReptileTaskService extends CrudService<ReptileTaskDao, ReptileTask>
 
         AssertUtil.notNull(type,"cw文件中没有找到task_type");
         AssertUtil.notNull(webUrl,"cw文件中没有找到网站url");
-        reptileTask.setWebsiteUrl(webUrl);
+
 
         if(WebsiteService.GDPOI.equals(type)||WebsiteService.BDPOI.equals(type)){
+            reptileTask.setWebsiteUrl(webUrl);
             jsonElement.getAsJsonObject().get("poi_kword").getAsJsonArray().addAll(ar);
-
-            //将上传文件保存到一个目标文件当中
-//            Calendar date = Calendar.getInstance();
-//            String newfileName=DateUtils.getDate("yyyyMMddHHmmssSSS")+".cw";
-//            String newpath=date.get(Calendar.YEAR) + File.separator + (date.get(Calendar.MONTH)+1) + File.separator+ date.get(Calendar.DAY_OF_MONTH)+File.separator;
-//            File newfile=new File(Global.getUserfilesBaseDir() + File.separator +newpath);
-//            if(!newfile.exists()){
-//                newfile.mkdirs();
-//            }
-//            String path=Global.getUserfilesBaseDir() + File.separator +newpath+ newfileName;
-//            FileUtils.writeToFile(path,new Gson().toJson(jsonElement),false);
-//            reptileTask.setCrawlerUrl(newpath.replaceAll("\\\\","/")+ newfileName);
-        }else{
-//            reptileTask.setCrawlerUrl(reptileTask.getCrawlerId().getCrawlerUrl());
         }
-        return new Gson().toJson(jsonElement);
+        if(WebsiteService.GENERAL.equals(type)){//通用网站处理
+            AssertUtil.notEmpty(reptileTask.getWebsiteUrl(),"通用爬虫时爬取链接不能为空");
+            jsonElement.getAsJsonObject().get("keyword").getAsJsonArray().addAll(ar);
+            jsonElement.getAsJsonObject().addProperty("inlet","https://blog.csdn.net/ceovip/article/details/81102599");
+        }
+        return jsonElement.getAsJsonObject();
 
+    }
+    /*
+     *
+     * @version v1000
+     * 获取zk 上的爬虫状态
+     **/
+    public List getTaskState(String id) {
+        ReptileTask reptileTask=get(id);
+        AssertUtil.notNull(reptileTask,"未查询到相关任务");
+        reptileTask.getTaskName();
+        List<Map> list=new ArrayList<Map>();
+        for (ServiceTask serviceTask:reptileTask.getServiceList()){
+
+            try {
+                String path=ZookeeperSession.rootPath+"/"+serviceTask.getServiceIp()+"/tasks/"+reptileTask.getTaskName();
+                String json=new String(ZookeeperSession.getZooKeeper().getData(path,false,new Stat()));
+                json=json.substring(json.indexOf("{"),json.length());
+                Map map=new  GsonBuilder().create().fromJson(json,Map.class);
+                Map rs=new HashMap();
+                rs.put("执行状态",map.get("status"));
+                rs.put("爬取数量",(Double)map.get("excute_count"));
+                list.add(rs);
+            } catch (KeeperException e) {
+                if(e instanceof KeeperException.NoNodeException){
+                    throw  new RuntimeException("该任务已经下线,请重新部署后查看");
+                }
+                e.printStackTrace();
+                throw  new RuntimeException("获取Zk数据异常,请检查zk服务器KeeperException" );
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                throw  new RuntimeException("获取Zk数据异常,请检查zk服务器 InterruptedException");
+            }
+        }
+        return  list;
     }
 }

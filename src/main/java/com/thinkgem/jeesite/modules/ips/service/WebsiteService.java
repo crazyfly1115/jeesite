@@ -32,6 +32,7 @@ public class WebsiteService extends CrudService<WebsiteDao, Website> {
 
     public   static  final  String BDPOI="BDPOI";
     public  static final String GDPOI="GDPOI";
+    public  static  final  String GENERAL="GENERAL";
     //根据模板类型  分类数据
     public List getTypelist(String id) {
 

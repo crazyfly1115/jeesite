@@ -29,7 +29,8 @@
 				a.crawler_url AS "crawlerUrl",
 				w11.website_name AS "websiteId.websiteName",
 				w12.database_name AS "databaseId.databaseName",
-				w14.crawler_name AS "crawlerId.crawlerName"
+				w14.crawler_name AS "crawlerId.crawlerName",
+				w14.crawler_json AS "crawlerId.crawlerJson"
 	</sql>
 	
 	<sql id="reptileTaskJoins">

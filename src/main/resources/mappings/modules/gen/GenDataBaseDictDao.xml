@@ -117,7 +117,16 @@
 				1=1
 				<if test="col != null ">
 					<foreach item="item" index="index" collection="col">
-						and  ${item.colName} ${item.searchType} #{item.colValue}
+
+
+						<choose>
+							<when test="item.searchType='like'">
+								and  ${item.colName} LIKE concat('%',#{item.colValue},'%')
+							</when>
+							<otherwise>
+								and  ${item.colName} ${item.searchType} #{item.colValue}
+							</otherwise>
+						</choose>
 					</foreach>
 				</if>
 			</where>
