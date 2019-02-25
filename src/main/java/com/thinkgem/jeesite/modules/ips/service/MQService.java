@@ -30,8 +30,6 @@ public class MQService {
 
     private final String serveraddr= Global.getConfig("mq_serveraddr");
     private final String nameserveraddr= Global.getConfig("mq_nameserveraddr");
-    private static String ErrMq="errMq";
-    private final String topic="ErrorTopic";//错误信息日志
     protected static Logger logger = LoggerFactory.getLogger(MQService.class);
 
    private  ServiceErrService serviceErrService =null;
@@ -41,7 +39,7 @@ public class MQService {
     //获取错误消息
 
     public void getErrMessage() throws MQClientException {
-        //设置消费者组
+        //设置消费者组  为该组名字
         DefaultMQPushConsumer consumer = new DefaultMQPushConsumer("ErrorTopic");
 
         consumer.setVipChannelEnabled(false);

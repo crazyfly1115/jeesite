@@ -57,7 +57,9 @@ public class ServiceErrController extends BaseController {
 	@RequiresPermissions("ips:serviceErr:view")
 	@RequestMapping(value = {"list"})
 	@ResponseBody
-	public String list(ServiceErr serviceErr, HttpServletRequest request, HttpServletResponse response) {
+	public String list(@RequestParam(required = true) String id, HttpServletRequest request, HttpServletResponse response) {
+		ServiceErr serviceErr=new ServiceErr();
+		serviceErr.setTaskId(id);
 		Page<ServiceErr> page = serviceErrService.findPage(new Page<ServiceErr>(request, response), serviceErr);
 		return new Ret("data",page).toString();
 	}

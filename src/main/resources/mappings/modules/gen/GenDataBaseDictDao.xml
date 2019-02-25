@@ -115,6 +115,9 @@
 			select * from ${tableName}
 			<where>
 				1=1
+				<if test="fkId!= null and fkId != ''">
+					and  fk_id=#{fkId}
+				</if>
 				<if test="col != null ">
 					<foreach item="item" index="index" collection="col">
 

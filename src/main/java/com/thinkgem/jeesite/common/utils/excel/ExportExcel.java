@@ -179,7 +179,8 @@ public class ExportExcel {
 	public ExportExcel(String title, List<String> headerList) {
 		initialize(title, headerList);
 	}
-	
+
+
 	/**
 	 * 初始化函数
 	 * @param title 表格标题，传“空值”，表示无标题
@@ -408,7 +409,20 @@ public class ExportExcel {
 		}
 		return this;
 	}
-	
+	// 传入数据 和对应的数据的keyList
+	public <E> ExportExcel setMapList(List<Map> list,List<String> keyList){
+		for (Map map : list){
+			int colunm = 0;
+			Row row = this.addRow();
+			StringBuilder sb = new StringBuilder();
+			for (String key : keyList){
+				this.addCell(row, colunm++, map.get(key));
+				sb.append(map.get(key) + ", ");
+			}
+			log.debug("Write success: ["+row.getRowNum()+"] "+sb.toString());
+		}
+		return this;
+	}
 	/**
 	 * 输出数据流
 	 * @param os 输出数据流

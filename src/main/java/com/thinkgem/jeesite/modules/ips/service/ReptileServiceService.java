@@ -41,29 +41,29 @@ public class ReptileServiceService extends CrudService<ReptileServiceDao, Reptil
     /*private ReptileServiceService() {
     }*/
 
-    private static class SingletonClassInstance {
-        private static ZooKeeper zooKeeper = null;
-
-        public static ZooKeeper getInstance() {
-            if(zooKeeper==null) {
-                synchronized (ZooKeeper.class) {
-                    if (zooKeeper == null||!zooKeeper.getState().isConnected()) {
-                        try {
-                            zooKeeper = ZookeeperSession.getZooKeeper();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            //logger.error("",e);
-                            throw  new RuntimeException("连接Zookeeper失败");
-                        }
-                    }
-
-                }
-            }
-
-            return zooKeeper;
-        }
-
-    }
+//    private static class SingletonClassInstance {
+//        private static ZooKeeper zooKeeper = null;
+//
+//        public static ZooKeeper getInstance() {
+//            if(zooKeeper==null) {
+//                synchronized (ZooKeeper.class) {
+//                    if (zooKeeper == null||!zooKeeper.getState().isConnected()) {
+//                        try {
+//                            zooKeeper = ZookeeperSession.getZooKeeper();
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                            //logger.error("",e);
+//                            throw  new RuntimeException("连接Zookeeper失败");
+//                        }
+//                    }
+//
+//                }
+//            }
+//
+//            return zooKeeper;
+//        }
+//
+//    }
 
     /**
      * @Author zhangsy
@@ -80,7 +80,7 @@ public class ReptileServiceService extends CrudService<ReptileServiceDao, Reptil
 
             String partntRoot="";
             String URLPath="";
-           ZooKeeper zooKeeper= SingletonClassInstance.getInstance();
+           ZooKeeper zooKeeper= ZookeeperSession.getZooKeeper();
             List<String> listPath=new ArrayList<String>();
 //            listPath=zooKeeper.getChildren(ZookeeperSession.rootPath,null);//root
 //            for (String ss:listPath){
@@ -145,7 +145,7 @@ public class ReptileServiceService extends CrudService<ReptileServiceDao, Reptil
    }
     public List<ReptileService> getServer() {
         List<ReptileService> rsList=new ArrayList<ReptileService>();
-        ZooKeeper zooKeeper= SingletonClassInstance.getInstance();
+        ZooKeeper zooKeeper= ZookeeperSession.getZooKeeper();
         try {
             //zooKeeper = ZookeeperSession.getZooKeeper();
             List<String> listPath=new ArrayList<String>();
@@ -166,7 +166,7 @@ public class ReptileServiceService extends CrudService<ReptileServiceDao, Reptil
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("",e);
-            throw  new RuntimeException("设置Zookeeper失败");
+            throw  new RuntimeException("获取ZookeeperSession失败");
         }
         return  rsList;
     }

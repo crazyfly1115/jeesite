@@ -11,6 +11,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import com.thinkgem.jeesite.common.utils.AssertUtil;
+import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.ips.entity.Subitem;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,6 +57,7 @@ public class CrawlerService extends CrudService<CrawlerDao, Crawler> {
         }
     }
     private  String  getSQL(List<Subitem> subitemList,String table,boolean isDrop,List sqls) {
+        if(!StringUtils.strIsRigthTable(table))throw  new RuntimeException("表名只能由下划线字母数字组成,请检查cw文件中name 是否含有中文");
         String sql="";
         if(isDrop){
            sql+= "DROP TABLE IF EXISTS "+table+"; ";
@@ -65,10 +67,10 @@ public class CrawlerService extends CrudService<CrawlerDao, Crawler> {
             checkKeyWord(subitem.getName());
             sql=sql+subitem.getName()+" varchar(255) DEFAULT NULL COMMENT '"+subitem.getField_des()+"',";
         }
-        sql+="	id varchar(64) NOT NULL DEFAULT '',\n" +
-                "  grab_time datetime DEFAULT NULL,\n" +
-                "  version int DEFAULT 0,\n" +
-                "  fk_id varchar(64)  DEFAULT NULL,\n" +
+        sql+="	id varchar(64) NOT NULL DEFAULT '' COMMENT '主键',\n" +
+                "  grab_time datetime DEFAULT NULL COMMENT '抓取时间',\n" +
+                "  version int DEFAULT 0 COMMENT '版本',\n" +
+                "  fk_id varchar(64)  DEFAULT NULL COMMENT '外键',\n" +
                 "  create_by varchar(64) NOT NULL DEFAULT '1' COMMENT '创建者',\n" +
                 "  create_date datetime NOT NULL COMMENT '创建时间',\n" +
                 "  update_by varchar(64) NOT NULL COMMENT '更新者',\n" +
@@ -149,11 +151,20 @@ public class CrawlerService extends CrudService<CrawlerDao, Crawler> {
                 pks.add(subitem.getName());
             }
         }
+        map.put(table,pks);
         for (Subitem subitem:subitemList){
             if (subitem.getSubitem() != null) {
                 getPk(subitem.getSubitem(),table+=("_"+subitem.getName()),map);
             }
         }
-        map.put(table,pks);
+
+    }
+    public  List<Subitem> getSubitem(String json){
+        List<String> sqls=new ArrayList<String>();
+        JsonParser parser = new JsonParser();
+        JsonElement jsonElement=parser.parse(json);
+        JsonArray sub=jsonElement.getAsJsonObject().get("items").getAsJsonArray().get(0).getAsJsonObject().get("subitem").getAsJsonArray();
+        List<Subitem> subitemList=new Gson().fromJson(new Gson().toJsonTree(sub),new TypeToken<List<Subitem>>(){}.getType());
+        return subitemList;
     }
 }

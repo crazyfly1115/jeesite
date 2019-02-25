@@ -94,23 +94,36 @@ public class ReptileTaskController extends BaseController {
 	 * @version v1000
 	 **/
 	@RequiresPermissions("ips:reptileTask:view")
-	@RequestMapping(value = {"updateTask"})
+	@RequestMapping(value = {"startTask"})
 	@ResponseBody
-	public String updateTask(@RequestParam(required = true)String id){
+	public String startTask(@RequestParam(required = true)String id){
 		ReptileTask reptileTask=reptileTaskService.get(id);
 		AssertUtil.notNull(reptileTask,"未查询到相关数据");
 		reptileTaskService.startTask(reptileTask);
-		return new Ret(0,"更新成功").toString();
+		return new Ret(0,"部署成功").toString();
 	}
+
+	/**
+	下线任务 将爬虫中的任务和和存储中的任务删除
+	 * @version v1000
+	 **/
 	@RequiresPermissions("ips:reptileTask:view")
-	@RequestMapping(value = {"changeState"})
+	@RequestMapping(value = {"stopTask"})
 	@ResponseBody
-	public String changeState(@RequestParam(required = true)String id,@RequestParam(required = true)String state){
-		ReptileTask reptileTask=reptileTaskService.get(id);
-		AssertUtil.notNull(reptileTask,"未查询到相关数据");
-		reptileTaskService.changeState(reptileTask,Integer.parseInt(state));
-		return new Ret(0,"更新成功").toString();
+	public String stopTask(@RequestParam(required = true)String id){
+
+		reptileTaskService.deleteTask(id,2);
+		return new Ret(0,"下线成功").toString();
 	}
+//	@RequiresPermissions("ips:reptileTask:view")
+//	@RequestMapping(value = {"changeState"})
+//	@ResponseBody
+//	public String changeState(@RequestParam(required = true)String id,@RequestParam(required = true)String state){
+//		ReptileTask reptileTask=reptileTaskService.get(id);
+//		AssertUtil.notNull(reptileTask,"未查询到相关数据");
+//
+//		return new Ret(0,"更新成功").toString();
+//	}
 	/**
 	 * @version v1000
 	 * 获取爬虫状态

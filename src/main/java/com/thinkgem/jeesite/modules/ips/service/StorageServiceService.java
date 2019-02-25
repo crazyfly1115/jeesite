@@ -104,10 +104,12 @@ public class StorageServiceService extends CrudService<StorageServiceDao, Storag
             e.printStackTrace();
         }
         if(rs!=null){
-
             String tx=new String(rs);
+            logger.debug("获取的zk存储数据:"+tx);
             if (tx.indexOf("[")>-1){
+                tx=tx.substring(tx.indexOf("[")+1,tx.length());
                 tx=tx.substring(tx.indexOf("["),tx.length());
+                logger.debug("格式化后的数据:"+tx);
                 Gson gson=new Gson();
                 listTask=new Gson().fromJson(tx, new TypeToken<List<Map<String, String>>>(){}.getType());
                 //[{"task_status":"ON","task_lastid":"10","task_begin_time":"1548239964982","task_id":"9b9d24e0b8fb4aefb9b9513cc9090472"}]
@@ -147,7 +149,7 @@ public class StorageServiceService extends CrudService<StorageServiceDao, Storag
         Map map=new HashMap();
 
         //解析文件 生成主键
-        Map task_bind_db=crawlerService.ParserJsonToPk(StringUtils.readToString(Global.getUserfilesBaseDir()+task.getCrawlerId().getCrawlerUrl()),task.getTableName());
+        Map task_bind_db=crawlerService.ParserJsonToPk(task.getCrawlerId().getCrawlerJson(),task.getTableName());
 
         task_bind_db.put("tb_name",task.getTableName());
 
@@ -172,5 +174,24 @@ public class StorageServiceService extends CrudService<StorageServiceDao, Storag
         if(rs==null)throw  new RuntimeException("请求存储服务器无返回值");
         if(false==pyRes.getSuccess())throw new RuntimeException("通知应用服务器失败,服务器响应"+pyRes.getErrormsg());
     }
+    public void deleteDataInput( ReptileTask task){
+        AssertUtil.notEmpty(task,"任务数据不能为空");
+        String name=task.getStorageServiceId();
 
+
+        String url="http://"+name.substring(name.lastIndexOf("_")+1,name.length())+"/sjgzimp/taskserver";
+        Map map=new HashMap();
+
+        map.put("task_id",task.getId());
+        map.put("task_status","stop");
+        String json=new Gson().toJson(map);
+        String rs=ClintUtil.postClint(url,json);
+
+
+        PyRes pyRes=new Gson().fromJson(rs,PyRes.class);
+        logger.debug("请求存储服务路径:{}请求内容:{}",url,json);
+        logger.debug("服务器响应:{} ",rs);
+        if(rs==null)throw  new RuntimeException("请求存储服务器无返回值");
+        if(false==pyRes.getSuccess())throw new RuntimeException("通知应用服务器失败,服务器响应"+pyRes.getErrormsg());
+    }
 }

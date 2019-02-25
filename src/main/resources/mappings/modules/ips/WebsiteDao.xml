@@ -19,7 +19,8 @@
 					w12.python_name AS "pythonPkgId.pythonName",
 					w12.python_url  AS "pythonPkgId.pythonUrl",
 					w14.crawler_url AS "crawlerId.crawlerUrl",
-					w14.crawler_name AS "crawlerId.crawlerName"
+					w14.crawler_name AS "crawlerId.crawlerName",
+					w14.crawler_json AS "crawlerId.crawlerJson"
 	</sql>
 	
 	<sql id="websiteJoins">

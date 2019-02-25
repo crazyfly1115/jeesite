@@ -422,4 +422,10 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 			throw  new RuntimeException("UnsupportedEncodingException");
 		}
 	}
+	//**判断表名为数字和下字母和下划线
+	public  static boolean strIsRigthTable(String table){
+		String reg="^\\w+$";
+		return  Pattern.matches(reg,table);
+	}
+
 }

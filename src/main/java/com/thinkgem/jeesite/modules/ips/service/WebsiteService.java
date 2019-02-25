@@ -51,9 +51,8 @@ public class WebsiteService extends CrudService<WebsiteDao, Website> {
         Website website=super.get(id);
         AssertUtil.notNull(website,"没有查询到相关模板数据");
 
-        website.getCrawlerId().getCrawlerUrl();
-
-        String json=StringUtils.readToString(Global.getUserfilesBaseDir()+website.getCrawlerId().getCrawlerUrl());
+        AssertUtil.notNull(website.getCrawlerId().getCrawlerJson(),"CW文件内容为空");
+        String json=website.getCrawlerId().getCrawlerJson();
         String type=ParserJsonToType(json);
         return type;
     }

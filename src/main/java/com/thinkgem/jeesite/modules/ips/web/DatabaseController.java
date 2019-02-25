@@ -7,15 +7,20 @@ import javax.xml.crypto.Data;
 import com.google.gson.reflect.TypeToken;
 import com.thinkgem.jeesite.common.bean.Ret;
 import com.thinkgem.jeesite.common.utils.AssertUtil;
+import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.Vuetree.VueTreeDTO;
+import com.thinkgem.jeesite.common.utils.excel.ExportExcel;
 import com.thinkgem.jeesite.modules.gen.entity.GenTable;
 import com.thinkgem.jeesite.modules.gen.entity.GenTableColumn;
 import com.thinkgem.jeesite.modules.gen.entity.SerachBean;
 import com.thinkgem.jeesite.modules.gen.entity.SerachColumn;
 import com.thinkgem.jeesite.modules.ips.entity.CollectField;
 import com.thinkgem.jeesite.modules.ips.entity.CollectTable;
+import com.thinkgem.jeesite.modules.ips.entity.ReptileService;
 import com.thinkgem.jeesite.modules.ips.service.CollectTableService;
 import com.thinkgem.jeesite.modules.ips.service.DuridService;
+import com.thinkgem.jeesite.modules.ips.service.ReptileTaskService;
+import com.thinkgem.jeesite.modules.sys.entity.User;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -45,6 +50,8 @@ public class DatabaseController extends BaseController {
 	private DuridService duridService;
 	@Autowired
 	private CollectTableService collectTableService;
+	@Autowired
+	private ReptileTaskService reptileTaskService;
 	@RequiresPermissions("ips:database:edit")
 	@RequestMapping(value = "save")
 	@ResponseBody
@@ -170,18 +177,15 @@ public class DatabaseController extends BaseController {
 	@RequiresPermissions("ips:database:view")
 	@RequestMapping(value = {"getColumnByTable"})
 	@ResponseBody
-	public  String getColumnByTable(@RequestParam(required = true) String id,String tableName){
+	public  String getColumnByTable(@RequestParam(required = true) String id,@RequestParam(required = true)String tableName,@RequestParam(required = true)String taskId){
 
 		Database database=databaseService.get(id);
 		AssertUtil.notNull(database,"数据库中未查询到该数据库");
 		List list=new ArrayList();
-		for(GenTableColumn g:duridService.getColumnByTable(database,tableName)){
-			CollectField c=new CollectField();
-			c.setFieldCode(g.getName());
-			c.setFieldName(g.getComments());
-			c.setFieldLength(g.getDataLength());
-			list.add(c);
-		}
+		list=reptileTaskService.getColumnByid(duridService.getColumnByTable(database,tableName),taskId,tableName);
+		//todo 获取任务ID 将任务的数据的子表核算出来
+
+
 		return new Ret().putMap("data",list).toString();
 
 	}
@@ -189,12 +193,13 @@ public class DatabaseController extends BaseController {
 	@RequiresPermissions("ips:database:view")
 	@RequestMapping(value = {"getTableData"})
 	@ResponseBody
-	public  String getTableData(@RequestParam(required = true) String id,@RequestParam(required = true) String tableName, String json,HttpServletRequest request, HttpServletResponse response){
+	public  String getTableData(@RequestParam(required = true) String id,@RequestParam(required = true) String tableName, String fkId,String json,HttpServletRequest request, HttpServletResponse response){
 
 		Database database=databaseService.get(id);
 		AssertUtil.notNull(database,"数据库中未查询到该数据库");
 		List<SerachColumn> sclist=gson.fromJson(json,new TypeToken<List<SerachColumn>>(){}.getType());
 		SerachBean serachBean=new SerachBean(tableName,sclist);
+		serachBean.setFkId(fkId);
 		return new Ret().putMap("data",duridService.getTableData(database,serachBean,new Page<Map>(request, response))).toString();
 
 	}
@@ -210,5 +215,31 @@ public class DatabaseController extends BaseController {
 
 		return new Ret().putMap("data",database).toString();
 
+	}
+	@RequiresPermissions("ips:database:view")
+	@RequestMapping(value = "export")
+	public String downTableData(@RequestParam(required = true) String id,@RequestParam(required = true) String tableName, String fkId,String json,HttpServletRequest request, HttpServletResponse response){
+		Database database=databaseService.get(id);
+		AssertUtil.notNull(database,"数据库中未查询到该数据库");
+		List<SerachColumn> sclist=gson.fromJson(json,new TypeToken<List<SerachColumn>>(){}.getType());
+		SerachBean serachBean=new SerachBean(tableName,sclist);
+		serachBean.setFkId(fkId);
+		Page page=new Page<Map>(request, response,-1);
+		duridService.getTableData(database,serachBean,page);
+
+		List<GenTableColumn> list=duridService.getColumnByTable(database,tableName);
+		List<String> headerList=new ArrayList<String>();
+		List<String> keyList=new ArrayList<String>();
+		for (GenTableColumn g:list){
+			headerList.add(g.getComments());
+			keyList.add(g.getName());
+		}
+		try {
+			String fileName = tableName+DateUtils.getDate("_yyyyMMddHHmmss")+".xlsx";
+			new ExportExcel(fileName, headerList).setMapList(page.getList(),keyList).write(response, fileName).dispose();
+			return null;
+		} catch (Exception e) {
+			return null;
+		}
 	}
 }
