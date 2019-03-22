@@ -1,6 +1,6 @@
 本项目基于JeeSite平台，感谢: <https://gitee.com/thinkgem/jeesite>
 
-
+取消 SpringContextHolde 中的统计代码
 
 1.本项目修改部分为：前端改为基于Vue单页面程序，后端适配改为前后端分离
 2.代码生成部分，只生成后端部门，前端自动渲染通用框架情况下，
