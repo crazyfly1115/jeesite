@@ -427,5 +427,17 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 		String reg="^\\w+$";
 		return  Pattern.matches(reg,table);
 	}
-
+	//字符串是否含有大写字母
+	public static boolean IshaveUpperCase(final CharSequence cs) {
+		if (cs == null || isEmpty(cs)) {
+			return false;
+		}
+		final int sz = cs.length();
+		for (int i = 0; i < sz; i++) {
+			if (Character.isUpperCase(cs.charAt(i)) == true) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

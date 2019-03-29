@@ -87,7 +87,7 @@ public class ReptileServiceService extends CrudService<ReptileServiceDao, Reptil
                 String path=ZookeeperSession.rootPath+"/"+server+"/"+"restapi";
                 partntRoot=path;
                 List<String> actionList=zooKeeper.getChildren(path,null);
-                AssertUtil.notEmpty(actionList,path+"下没有获取到子节点");
+                AssertUtil.notEmpty(actionList,"该服务未启动:原因:"+path+"下没有获取到子节点");
                 for (String ssC:actionList){
                     if(ssC.contains(action)){
                         URLPath=ssC;

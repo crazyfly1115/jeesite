@@ -16,6 +16,7 @@ public class Subitem {
     private String json;
     private String field_des;
     private String is_update;
+    private String data_type;
     private List<Subitem> subitem;
     public void setName(String name) {
         this.name = name;
@@ -65,6 +66,14 @@ public class Subitem {
 
     public void setSubitem(List<Subitem> subitem) {
         this.subitem = subitem;
+    }
+
+    public String getData_type() {
+        return data_type;
+    }
+
+    public void setData_type(String data_type) {
+        this.data_type = data_type;
     }
 
     @Override

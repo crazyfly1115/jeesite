@@ -100,38 +100,40 @@ public class DuridService{
 
 
     private static final Map<String, SqlSessionFactory> SQLSESSIONFACTORYS = new HashMap();
+    private static final Map<String, DataSource> DataSourceMap = new HashMap();
     public SqlSessionFactory getSqlSessionFactory(Database database){
-        SqlSessionFactory sqlSessionFactory= SQLSESSIONFACTORYS.get(database.getId());
+//        SqlSessionFactory sqlSessionFactory= SQLSESSIONFACTORYS.get(database.getId());
 
-        if(sqlSessionFactory!=null){
+
+        DataSource dataSource= null;
+        if(DataSourceMap.get(database.getId())!=null){
             //缓存中存在
             log.debug("获取到缓存中的数据库:"+database.getId());
-            return  sqlSessionFactory;
+            dataSource=DataSourceMap.get(database.getId());
+        }else{
+
+                Properties properties=new Properties();
+
+                AssertUtil.notNull(database.getDatabaseUrl(),"数据库连接不能为空");
+                AssertUtil.notNull(database.getLoginUser(),"数据库用户名不能为空");
+                AssertUtil.notNull(database.getLoginPsw(),"数据库密码不能为空");
+
+
+                properties.setProperty("url",database.getDatabaseUrl());//"jdbc:mysql://localhost:3306/ips?useUnicode=true&characterEncoding=utf-8"
+                properties.setProperty("username",database.getLoginUser());
+                properties.setProperty("password",database.getLoginPsw());
+                properties.setProperty("initialSize","1");
+                properties.setProperty("minIdle","1");
+                properties.setProperty("maxActive","1");
+                try {
+
+                    dataSource = DruidDataSourceFactory.createDataSource(properties);
+                    DataSourceMap.put(database.getId(),dataSource);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw  new RuntimeException("创建连接失败,请检查URL,USERNAME,PASSWD");
+                }
         }
-
-
-        Properties properties=new Properties();
-
-        AssertUtil.notNull(database.getDatabaseUrl(),"数据库连接不能为空");
-        AssertUtil.notNull(database.getLoginUser(),"数据库用户名不能为空");
-        AssertUtil.notNull(database.getLoginPsw(),"数据库密码不能为空");
-
-
-        properties.setProperty("url",database.getDatabaseUrl());//"jdbc:mysql://localhost:3306/ips?useUnicode=true&characterEncoding=utf-8"
-        properties.setProperty("username",database.getLoginUser());
-        properties.setProperty("password",database.getLoginPsw());
-        properties.setProperty("initialSize","1");
-        properties.setProperty("minIdle","1");
-        properties.setProperty("maxActive","1");
-        DataSource dataSource= null;
-        try {
-
-            dataSource = DruidDataSourceFactory.createDataSource(properties);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw  new RuntimeException("创建连接失败,请检查URL,USERNAME,PASSWD");
-        }
-
         SqlSessionFactoryBean sqlSessionFactoryBean=new SqlSessionFactoryBean();
         sqlSessionFactoryBean.setDataSource(dataSource);
         sqlSessionFactoryBean.setTypeAliasesPackage("com.thinkgem.jeesite");
@@ -143,12 +145,12 @@ public class DuridService{
         Resource conf = new ClassPathResource("mybatis-config.xml");
         sqlSessionFactoryBean.setConfigLocation(conf);
         try {
-            sqlSessionFactory = sqlSessionFactoryBean.getObject();
+            SqlSessionFactory sqlSessionFactory = sqlSessionFactoryBean.getObject();
+            return  sqlSessionFactory;
         } catch (Exception e) {
             e.printStackTrace();
             throw  new RuntimeException("创建连接失败,请检查URL,USERNAME,PASSWD");
         }
-        SQLSESSIONFACTORYS.put(database.getId(),sqlSessionFactory);
-        return  sqlSessionFactory;
+
     }
 }

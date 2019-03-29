@@ -225,6 +225,7 @@ public class DatabaseController extends BaseController {
 		SerachBean serachBean=new SerachBean(tableName,sclist);
 		serachBean.setFkId(fkId);
 		Page page=new Page<Map>(request, response,-1);
+		page.setPageSize(10000);
 		duridService.getTableData(database,serachBean,page);
 
 		List<GenTableColumn> list=duridService.getColumnByTable(database,tableName);

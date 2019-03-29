@@ -95,7 +95,6 @@ LoginController extends BaseController{
 		
 		// 如果已经登录，则跳转到管理首页
 		if(principal != null){
-//			return "redirect:" + adminPath;
 			Ret ret=new Ret();
 			ret.setRet(0);
 			ret.setMsg("登录成功");
@@ -137,7 +136,10 @@ LoginController extends BaseController{
 
 		// 验证失败清空验证码
 		request.getSession().setAttribute(ValidateCodeServlet.VALIDATE_CODE, IdGen.uuid());
-		return ret.toString();
+		ret.setRet(1);
+		return  ret.toString();
+//		return renderString(response, ret.toString(),"application/json");
+//		return ret.toString();
 		// 如果是手机登录，则返回JSON字符串
 //		if (mobile){
 //	        return renderString(response, model);
@@ -224,7 +226,7 @@ LoginController extends BaseController{
 		if (clean){
 			loginFailMap.remove(useruame);
 		}
-		return loginFailNum >= 3;
+		return loginFailNum >= 99;
 	}
 
 	/**

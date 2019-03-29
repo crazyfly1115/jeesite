@@ -183,7 +183,7 @@ public class StorageServiceService extends CrudService<StorageServiceDao, Storag
         Map map=new HashMap();
 
         map.put("task_id",task.getId());
-        map.put("task_status","stop");
+        map.put("task_status","STOP");
         String json=new Gson().toJson(map);
         String rs=ClintUtil.postClint(url,json);
 

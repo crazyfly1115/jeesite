@@ -2,10 +2,8 @@ package com.thinkgem.jeesite.modules.ips.service;
 
 import java.util.*;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.gson.*;
 import com.thinkgem.jeesite.common.config.Global;
-import com.thinkgem.jeesite.common.mapper.JsonMapper;
 import com.thinkgem.jeesite.common.persistence.DataEntity;
 import com.thinkgem.jeesite.common.utils.*;
 import com.thinkgem.jeesite.modules.gen.entity.GenTableColumn;
@@ -16,7 +14,6 @@ import org.apache.zookeeper.data.Stat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +27,7 @@ import com.thinkgem.jeesite.modules.ips.dao.ReptileTaskDao;
  *  尚渝网络
  */
 @Service
-@Transactional(readOnly = true)
+@Transactional(readOnly = false)
 @Lazy(false)
 public class ReptileTaskService extends CrudService<ReptileTaskDao, ReptileTask> {
     @Autowired
@@ -141,14 +138,13 @@ public class ReptileTaskService extends CrudService<ReptileTaskDao, ReptileTask>
             rs.put("task_name",map.get("task_name"));
             rs.put("schedule_type",state);
             rs.put("task_id",map.get("task_id"));
-            reptileService.updateServerByZookeaper(serviceTask.getServiceIp(),"task_schedule",new GsonBuilder()
-                    .serializeNulls()
-                    .create().toJson(rs));
+            reptileService.updateServerByZookeaper(serviceTask.getServiceIp(),"task_schedule",new GsonBuilder().serializeNulls().create().toJson(rs));
         }
 
         storageService.deleteDataInput(reptileTask);
+        reptileTask.setTaskState("已删除");
+        dao.update(reptileTask);
     }
-
     @Override
     public void deleteByIds(String[] ids) {
         for (String id:ids){
@@ -231,11 +227,15 @@ public class ReptileTaskService extends CrudService<ReptileTaskDao, ReptileTask>
                 Map map=new  GsonBuilder().create().fromJson(json,Map.class);
                 Map rs=new HashMap();
                 String state=map.get("status").toString();
+                if(state.equals("INIT"))state="未启动";
                 if(state.equals("START"))state="执行中";
                 if(state.equals("WARN"))state="异常结束";
                 if(state.equals("STOP"))state="正常结束";
+                if(state.equals("DELETE"))state="已删除";
                 rs.put("执行状态",state);
-                rs.put("爬取数量",(Double)map.get("excute_count"));
+                rs.put("总量",(Double)map.get("url_count"));
+                rs.put("grabbed_count",map.get("grabbed_count"));
+                rs.put("remain_time",map.get("remain_time"));
                 list.add(rs);
             } catch (KeeperException e) {
                 if(e instanceof KeeperException.NoNodeException){
@@ -264,11 +264,27 @@ public class ReptileTaskService extends CrudService<ReptileTaskDao, ReptileTask>
                 List<String> taskList=ZookeeperSession.getZooKeeper().getChildren(taskPath,false);
                 for (String taskId:taskList){
                     String json=new String(ZookeeperSession.getZooKeeper().getData(taskPath+"/"+taskId,false,new Stat()));
-                    logger.debug("获取任务的Json:"+json);
+//                    logger.debug("获取任务的Json:"+json);
                     json=json.substring(json.indexOf("{"),json.length());
-                    logger.debug("获取任务的格式化Json:"+json);
+//                    logger.debug("获取任务的格式化Json:"+json);
                     Map map=new  GsonBuilder().create().fromJson(json,Map.class);
-                    logger.debug("同步zk数据节点返回");
+//                    logger.debug("同步zk数据节点返回"+map.get("status"));
+                    ReptileTask reptileTask=new ReptileTask();
+                    reptileTask.setId(taskId);
+                    reptileTask.setComplateTime(map.get("remain")==null?"计算中":map.get("remain").toString());
+
+                    String state=map.get("status")==null?"未启动":map.get("status").toString();
+                    if(state.equals("INIT"))state="未启动";
+                    if(state.equals("START"))state="执行中";
+                    if(state.equals("WARN"))state="异常结束";
+                    if(state.equals("STOP"))state="正常结束";
+                    if(state.equals("DELETE"))state="已删除";
+
+                    reptileTask.setTaskState(state);
+                    if(map.get("status")!=null&&map.get("remain")!=null){
+                        dao.updateComplateTime(reptileTask);
+
+                    }
                 }
             }
         } catch (KeeperException e) {
@@ -307,5 +323,22 @@ public class ReptileTaskService extends CrudService<ReptileTaskDao, ReptileTask>
 
         return rsList;
     }
+
+    //返回统计数据
+    public Map getTJSJ(){
+        Map map=new HashMap();
+        map.put("zcjl",dao.zcjl());
+        map.put("jrcjl",dao.jrcjl());
+        map.put("zrws",dao.zrws());
+        map.put("zxzrws",dao.zxzrws());
+
+        map.put("jrsjxq",dao.jrsjxq());
+        map.put("jrrwssxx",dao.jrrwssxx());
+
+        map.put("jrsjtop",dao.jrsjtop());
+        map.put("rwbl",dao.rwbl());
+        return map;
+    }
+
 
 }

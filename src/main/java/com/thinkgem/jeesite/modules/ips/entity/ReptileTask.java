@@ -35,7 +35,7 @@ public class ReptileTask extends DataEntity<ReptileTask> {
 	private String taskType;		// 任务类型
 	private String websiteUrl;//website_url 网站url
 	private String crawlerUrl;//crawler_url 爬虫url
-
+	private String complateTime;//
 	private String crawlerJson;//任务内容
 	private List<ServiceTask> serviceList;
 	
@@ -216,5 +216,13 @@ public class ReptileTask extends DataEntity<ReptileTask> {
 
 	public void setCrawlerJson(String crawlerJson) {
 		this.crawlerJson = crawlerJson;
+	}
+
+	public String getComplateTime() {
+		return complateTime;
+	}
+
+	public void setComplateTime(String complateTime) {
+		this.complateTime = complateTime;
 	}
 }

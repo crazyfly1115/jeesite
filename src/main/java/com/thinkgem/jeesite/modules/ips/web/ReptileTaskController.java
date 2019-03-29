@@ -115,6 +115,15 @@ public class ReptileTaskController extends BaseController {
 		reptileTaskService.deleteTask(id,2);
 		return new Ret(0,"下线成功").toString();
 	}
+
+
+	@RequiresPermissions("ips:reptileTask:view")
+	@RequestMapping(value = {"getTJSJ"})
+	@ResponseBody
+	public String getTJSJ(){
+
+		return new Ret().putData(reptileTaskService.getTJSJ()).toString();
+	}
 //	@RequiresPermissions("ips:reptileTask:view")
 //	@RequestMapping(value = {"changeState"})
 //	@ResponseBody

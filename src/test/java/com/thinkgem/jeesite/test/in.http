@@ -1,0 +1,22 @@
+http://127.0.0.1:8000/bizproxyif/apple/saveWifi?ssid=1
+###
+http://teacher.frp.heikuai.net:5555/bizproxyif/apple/saveWifi?json=[{
+                                                                       "ssid" : "heikuai",
+                                                                       "bssid" : "00:00:00:000:00",
+                                                                       "signal" : "0.9023565",
+                                                                       "latitude" : "26.235644",
+                                                                       "longitude" : "106.58978",
+                                                                       "time" : "15823652365",
+                                                                       "userAccount" : "sy0001"
+                                                                   },
+                                                                   {
+                                                                       "ssid" : "heikuai",
+                                                                       "bssid" : "00:00:00:000:00",
+                                                                       "signal" : "0.9023565",
+                                                                       "latitude" : "26.235644",
+                                                                       "longitude" : "106.58978",
+                                                                       "time" : "15823652365",
+                                                                       "userAccount" : "sy0001"
+                                                                   }]
+
+###
