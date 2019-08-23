@@ -46,6 +46,8 @@ public class ReptileTaskService extends CrudService<ReptileTaskDao, ReptileTask>
 
     @Autowired
     private  StorageServiceService storageService;
+    @Autowired
+    private  MQService mqService;
     @Override
     @Transactional
     public void save(ReptileTask entity) {
@@ -99,7 +101,7 @@ public class ReptileTaskService extends CrudService<ReptileTaskDao, ReptileTask>
         }
     }
     /**
-     * 启动一个爬虫任务
+     * 部署并启动一个爬虫任务
      * @param
      * @return
      */
@@ -142,7 +144,7 @@ public class ReptileTaskService extends CrudService<ReptileTaskDao, ReptileTask>
         }
 
         storageService.deleteDataInput(reptileTask);
-        reptileTask.setTaskState("已删除");
+        reptileTask.setTaskState("已下线");
         dao.update(reptileTask);
     }
     @Override
@@ -229,9 +231,10 @@ public class ReptileTaskService extends CrudService<ReptileTaskDao, ReptileTask>
                 String state=map.get("status").toString();
                 if(state.equals("INIT"))state="未启动";
                 if(state.equals("START"))state="执行中";
+                if(state.equals("PAUSE"))state="暂停中";
                 if(state.equals("WARN"))state="异常结束";
-                if(state.equals("STOP"))state="正常结束";
-                if(state.equals("DELETE"))state="已删除";
+                if(state.equals("STOP"))state="已完成";
+                if(state.equals("DELETE"))state="已下线";
                 rs.put("执行状态",state);
                 rs.put("总量",(Double)map.get("url_count"));
                 rs.put("grabbed_count",map.get("grabbed_count"));
@@ -256,6 +259,7 @@ public class ReptileTaskService extends CrudService<ReptileTaskDao, ReptileTask>
      **/
     @Scheduled(cron = "0/30 * * * * ?")
     public  void saveTaskData(){
+
         //todo 回写zk的数据到数据库
         try {
             List<String> serverList=ZookeeperSession.getZooKeeper().getChildren(ZookeeperSession.rootPath,false);
@@ -272,13 +276,21 @@ public class ReptileTaskService extends CrudService<ReptileTaskDao, ReptileTask>
                     ReptileTask reptileTask=new ReptileTask();
                     reptileTask.setId(taskId);
                     reptileTask.setComplateTime(map.get("remain")==null?"计算中":map.get("remain").toString());
+                    try {
+                        String s=mqService.queryConsumerByTopic(taskId+"_urls");
+                        s=s.replace(".0","");//去除Gson 转换的类型转换错误
+                        reptileTask.setComplateTime(s);
+                    }catch (Exception e){
+                        logger.debug("获取MQ 失败:该值不更新:"+taskId);
+                    }
 
                     String state=map.get("status")==null?"未启动":map.get("status").toString();
                     if(state.equals("INIT"))state="未启动";
                     if(state.equals("START"))state="执行中";
+                    if(state.equals("PAUSE"))state="暂停中";
                     if(state.equals("WARN"))state="异常结束";
-                    if(state.equals("STOP"))state="正常结束";
-                    if(state.equals("DELETE"))state="已删除";
+                    if(state.equals("STOP"))state="已完成";
+                    if(state.equals("DELETE"))state="已下线";
 
                     reptileTask.setTaskState(state);
                     if(map.get("status")!=null&&map.get("remain")!=null){
@@ -295,7 +307,10 @@ public class ReptileTaskService extends CrudService<ReptileTaskDao, ReptileTask>
             logger.error(reptileService.getClass().getName(),e);
         }
 
+
     }
+
+
     /*
      *根据任务id获取当前表的字段数据,包含多级字段
      * @version v1000
@@ -305,23 +320,57 @@ public class ReptileTaskService extends CrudService<ReptileTaskDao, ReptileTask>
         List<Map> rsList=new ArrayList<Map>();
 
         List<Subitem> list=crawlerService.getSubitem(reptileTask.getCrawlerId().getCrawlerJson());
+        Set<String> submitSet=new HashSet<String>();
+       //递归调取该配置文件是否包含主表数据
+        getSubItem(submitSet,list,"");
+
+
         for (GenTableColumn ctc:columnList){
             Map map=new HashMap();
             map.put("name",ctc.getName());
             map.put("fieldName",ctc.getComments());
             map.put("fieldLength",ctc.getDataLength());
             map.put("childTable","1");
-            if( StringUtils.countMatches(tableName,"_")==1){//表示是第一层
-                for (Subitem s:list){
-                    if(s.getSubitem()!=null&&s.getName().equals(ctc.getName())){
-                        map.put("childTable","0");
-                    }
-                }
+
+            String key="_"+ctc.getName();
+            if(StringUtils.countMatches(tableName,"_")>1){
+                String lastName=tableName.substring(tableName.lastIndexOf("_")+1,tableName.length());
+                key=lastName+key;
             }
+            if(submitSet.contains(key.toLowerCase())){
+                map.put("childTable","0");
+            }
+
+//            List<Subitem> userList=new ArrayList<Subitem>();
+//            List<Subitem> temp=null;
+//            for (int i=0;i<StringUtils.countMatches(tableName,"_");i++){
+//                if(temp==null){
+//                    temp=list;
+//                    continue;
+//                }
+//
+//
+//            }
+////            if( StringUtils.countMatches(tableName,"_")==1){//表示是第一层
+//                for (Subitem s:list){
+//                    if(s.getSubitem()!=null&&s.getName().equals(ctc.getName())){
+//                        map.put("childTable","0");
+//                    }
+//                }
+////            }
             rsList.add(map);
         }
 
         return rsList;
+    }
+    //递归获取子表数据
+    private void getSubItem(Set<String> submitmap, List<Subitem> list,String fatherNname) {
+        for (Subitem subitem:list){
+            if(subitem.getSubitem()!=null&&subitem.getSubitem().size()>0){
+                submitmap.add((fatherNname+"_"+subitem.getName()).toLowerCase());
+                getSubItem(submitmap,subitem.getSubitem(),subitem.getName());
+            }
+        }
     }
 
     //返回统计数据
@@ -339,6 +388,18 @@ public class ReptileTaskService extends CrudService<ReptileTaskDao, ReptileTask>
         map.put("rwbl",dao.rwbl());
         return map;
     }
-
+    //0：启动，1：停止，
+    public  void  task_schedule(String id,Integer state){
+        ReptileTask reptileTask=get(id);
+        AssertUtil.notNull(reptileTask,"未查询到相关数据");
+        Map map=getTask(reptileTask.getId());
+        for (ServiceTask serviceTask:reptileTask.getServiceList()){
+            Map rs=new HashMap();
+            rs.put("task_name",map.get("task_name"));
+            rs.put("schedule_type",state);
+            rs.put("task_id",map.get("task_id"));
+            reptileService.updateServerByZookeaper(serviceTask.getServiceIp(),"task_schedule",new GsonBuilder().serializeNulls().create().toJson(rs));
+        }
+    }
 
 }

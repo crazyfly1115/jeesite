@@ -193,13 +193,14 @@ public class DatabaseController extends BaseController {
 	@RequiresPermissions("ips:database:view")
 	@RequestMapping(value = {"getTableData"})
 	@ResponseBody
-	public  String getTableData(@RequestParam(required = true) String id,@RequestParam(required = true) String tableName, String fkId,String json,HttpServletRequest request, HttpServletResponse response){
+	public  String getTableData(@RequestParam(required = true) String id,@RequestParam(required = true) String tableName, String fkId,String logId,String json,HttpServletRequest request, HttpServletResponse response){
 
 		Database database=databaseService.get(id);
 		AssertUtil.notNull(database,"数据库中未查询到该数据库");
 		List<SerachColumn> sclist=gson.fromJson(json,new TypeToken<List<SerachColumn>>(){}.getType());
 		SerachBean serachBean=new SerachBean(tableName,sclist);
 		serachBean.setFkId(fkId);
+		serachBean.setLogId(logId);
 		return new Ret().putMap("data",duridService.getTableData(database,serachBean,new Page<Map>(request, response))).toString();
 
 	}
@@ -218,12 +219,13 @@ public class DatabaseController extends BaseController {
 	}
 	@RequiresPermissions("ips:database:view")
 	@RequestMapping(value = "export")
-	public String downTableData(@RequestParam(required = true) String id,@RequestParam(required = true) String tableName, String fkId,String json,HttpServletRequest request, HttpServletResponse response){
+	public String downTableData(@RequestParam(required = true) String id,@RequestParam(required = true) String tableName, String fkId,String logId,String json,HttpServletRequest request, HttpServletResponse response){
 		Database database=databaseService.get(id);
 		AssertUtil.notNull(database,"数据库中未查询到该数据库");
 		List<SerachColumn> sclist=gson.fromJson(json,new TypeToken<List<SerachColumn>>(){}.getType());
 		SerachBean serachBean=new SerachBean(tableName,sclist);
 		serachBean.setFkId(fkId);
+		serachBean.setLogId(logId);
 		Page page=new Page<Map>(request, response,-1);
 		page.setPageSize(10000);
 		duridService.getTableData(database,serachBean,page);

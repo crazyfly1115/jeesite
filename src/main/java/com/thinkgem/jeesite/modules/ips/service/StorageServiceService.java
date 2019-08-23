@@ -162,8 +162,28 @@ public class StorageServiceService extends CrudService<StorageServiceDao, Storag
         map.put("db_password",task.getDatabaseId().getLoginPsw());
         map.put("task_status","ON");
         map.put("mq_serveraddr",Global.getConfig("mq_serveraddr"));
-        map.put("mq_eachpulltime","10000");
+        map.put("mq_eachpulltime","100");
         map.put("mq_nameserveraddr",Global.getConfig("mq_nameserveraddr"));
+        String json=new Gson().toJson(map);
+        String rs=ClintUtil.postClint(url,json);
+
+
+        PyRes pyRes=new Gson().fromJson(rs,PyRes.class);
+        logger.debug("请求存储服务路径:{}请求内容:{}",url,json);
+        logger.debug("服务器响应:{} ",rs);
+        if(rs==null)throw  new RuntimeException("请求存储服务器无返回值");
+        if(false==pyRes.getSuccess())throw new RuntimeException("通知应用服务器失败,服务器响应"+pyRes.getErrormsg());
+    }
+    public void stopDataInput( ReptileTask task){
+        AssertUtil.notEmpty(task,"任务数据不能为空");
+        String name=task.getStorageServiceId();
+
+
+        String url="http://"+name.substring(name.lastIndexOf("_")+1,name.length())+"/sjgzimp/taskserver";
+        Map map=new HashMap();
+
+        map.put("task_id",task.getId());
+        map.put("task_status","STOP");
         String json=new Gson().toJson(map);
         String rs=ClintUtil.postClint(url,json);
 
@@ -183,7 +203,7 @@ public class StorageServiceService extends CrudService<StorageServiceDao, Storag
         Map map=new HashMap();
 
         map.put("task_id",task.getId());
-        map.put("task_status","STOP");
+        map.put("task_status","DEL");
         String json=new Gson().toJson(map);
         String rs=ClintUtil.postClint(url,json);
 

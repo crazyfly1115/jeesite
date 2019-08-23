@@ -36,7 +36,7 @@ public class ProxyService extends CrudService<ProxyIpsDao, ProxyIps> {
     }
     //
     public void saveIps(){
-        String url="http://webapi.http.zhimacangku.com/getip?num=3&type=2&pro=&city=0&yys=0&port=1&time=1&ts=1&ys=0&cs=0&lb=1&sb=0&pb=4&mr=1&regions=";
+        String url="http://webapi.http.zhimacangku.com/getip?num=1&type=2&pro=&city=0&yys=0&port=1&time=1&ts=1&ys=0&cs=0&lb=1&sb=0&pb=4&mr=1&regions=";
        String text=new QuickHttp().url(url)
                             .get().text();
        if(StringUtils.isBlank(text))throw  new RuntimeException("获取芝麻代理IP失败,返回数据为空");

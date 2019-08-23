@@ -113,10 +113,25 @@ public class ReptileTaskController extends BaseController {
 	public String stopTask(@RequestParam(required = true)String id){
 
 		reptileTaskService.deleteTask(id,2);
-		return new Ret(0,"下线成功").toString();
+		return new Ret(0,"删除成功").toString();
 	}
 
+	@RequiresPermissions("ips:reptileTask:view")
+	@RequestMapping(value = {"task_schedule_start"})
+	@ResponseBody
+	public String task_schedule_start(@RequestParam(required = true)String id){
 
+		reptileTaskService.task_schedule(id,0);
+		return new Ret(0,"启动成功").toString();
+	}
+	@RequiresPermissions("ips:reptileTask:view")
+	@RequestMapping(value = {"task_schedule_stop"})
+	@ResponseBody
+	public String task_schedule_stop(@RequestParam(required = true)String id){
+
+		reptileTaskService.task_schedule(id,1);
+		return new Ret(0,"停止成功").toString();
+	}
 	@RequiresPermissions("ips:reptileTask:view")
 	@RequestMapping(value = {"getTJSJ"})
 	@ResponseBody

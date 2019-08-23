@@ -101,7 +101,7 @@ public class DuridService{
 
     private static final Map<String, SqlSessionFactory> SQLSESSIONFACTORYS = new HashMap();
     private static final Map<String, DataSource> DataSourceMap = new HashMap();
-    public SqlSessionFactory getSqlSessionFactory(Database database){
+            public SqlSessionFactory getSqlSessionFactory(Database database){
 //        SqlSessionFactory sqlSessionFactory= SQLSESSIONFACTORYS.get(database.getId());
 
 

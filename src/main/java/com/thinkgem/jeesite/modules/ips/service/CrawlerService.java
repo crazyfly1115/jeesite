@@ -75,6 +75,11 @@ public class CrawlerService extends CrudService<CrawlerDao, Crawler> {
                 dataType="varchar(255)";
             }
             sql=sql+subitem.getName()+ " "+ dataType +" DEFAULT NULL COMMENT '"+subitem.getField_des()+"',";
+
+                //判断是否为主键 增加唯一索引;
+            if("0".equals(subitem.getIs_update())){
+                sql+="UNIQUE KEY UK_"+subitem.getName()+" ("+subitem.getName()+"), ";
+            }
         }
         sql+="	id varchar(64) NOT NULL DEFAULT '' COMMENT '主键',\n" +
                 "  grab_time datetime DEFAULT NULL COMMENT '抓取时间',\n" +

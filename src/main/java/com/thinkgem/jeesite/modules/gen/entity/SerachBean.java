@@ -8,6 +8,7 @@ import java.util.List;
 public class SerachBean  extends DataEntity<SerachBean> {
     private String tableName;
     private String fkId;
+    private String logId;
     private List<SerachColumn> col;
 
 
@@ -38,6 +39,14 @@ public class SerachBean  extends DataEntity<SerachBean> {
 
     public void setFkId(String fkId) {
         this.fkId = fkId;
+    }
+
+    public String getLogId() {
+        return logId;
+    }
+
+    public void setLogId(String logId) {
+        this.logId = logId;
     }
 
     public SerachBean() {

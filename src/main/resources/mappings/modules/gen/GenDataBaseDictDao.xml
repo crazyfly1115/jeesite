@@ -118,6 +118,9 @@
 				<if test="fkId!= null and fkId != ''">
 					and  fk_id=#{fkId}
 				</if>
+				<if test="logId!= null and logId != ''">
+					and  log_id=#{logId}
+				</if>
 				<if test="col != null ">
 					<foreach item="item" index="index" collection="col">
 
