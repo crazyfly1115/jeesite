@@ -1,3 +1,5 @@
+不在github管理该项目 迁移至码云 时常无法检出
+
 本项目基于JeeSite平台，感谢: <https://gitee.com/thinkgem/jeesite>
 
 取消 SpringContextHolde 中的统计代码
