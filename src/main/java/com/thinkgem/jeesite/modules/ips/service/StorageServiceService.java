@@ -214,4 +214,5 @@ public class StorageServiceService extends CrudService<StorageServiceDao, Storag
         if(rs==null)throw  new RuntimeException("请求存储服务器无返回值");
         if(false==pyRes.getSuccess())throw new RuntimeException("通知应用服务器失败,服务器响应"+pyRes.getErrormsg());
     }
+
 }
